@@ -1,0 +1,37 @@
+TODO
+
+- "limit" functionality
+- "search" functionality: outside the menu class!
+- adding entries
+  - insert the entry to the bibliography
+  - insert the entry to the entries list
+  - syntax: add TYPE KEY
+  - how to pass the values?
+    - a special screen taking and returning a hash of values
+- editing entries
+- sorting entries
+- keybinding tree
+  - binding: key -> command -> function
+  - but first: only binding of single keys without rebinding
+
+
+PROJECT
+
+ncurses bibliography manager
+
+main window:
+- table: key, author, title
+- <CR>: opens the file (if present) in an external PDF viewer
+- filtering by title, author etc.
+- adding an entry (type chosen interactively; key required)
+  - e.g. :add InProceedings janicki15
+- ":" enters command mode
+- deleting entry
+- changing field:
+  :change-author Janicki, Maciej
+  :change-year 2007
+- exporting entries
+  bibman bibliography.bib -e janicki15,sumalvico17 > mypaper.bib
+- command-line search
+  bibman bibliography.bib -s title morphology
+

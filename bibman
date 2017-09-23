@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+use Curses;
+use File::Basename;
+
+use FindBin qw($Bin);
+use lib "$Bin/.";
+use Bibman::MainScreen;
+
+# TODO proper handling of command-line parameters
+my $INPUT_FILE = shift @ARGV;
+
+$win = new Curses;
+initscr;
+raw;
+keypad($win, 1);
+noecho();
+curs_set(0);
+
+$main = new MainScreen();
+$main->open_bibliography($INPUT_FILE);
+$main->show($win);
+
+endwin;
+
