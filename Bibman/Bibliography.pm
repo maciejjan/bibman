@@ -51,6 +51,22 @@ sub get_properties {
   return \%properties;
 }
 
+sub make_bibtex {
+  my $type = shift;
+  my $key = shift;
+  my $properties_ref = shift;
+  my %properties = %$properties_ref;
+
+  my $result = "@" . $type . "{$key";
+  for my $key (sort keys %properties) {
+    if (defined($properties{$key})) {
+      $result .= ",\n  $key = {$properties{$key}}";
+    }
+  }
+  $result .= "\n}";
+  return $result;
+}
+
 sub format_authors {
 	my $entry = shift;
 	my @authors = $entry->names('author');

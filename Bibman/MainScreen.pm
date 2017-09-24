@@ -12,7 +12,8 @@ sub new {
   $class = shift;
   $self = {
     list   => new TabularList(4),
-    status => new StatusBar()
+    status => new StatusBar(),
+    mode   => "normal"               # "normal" or "command"
   };
   bless $self, $class;
 }
@@ -40,9 +41,27 @@ sub edit_entry {
   my $key = ${${$self->{list}->{items}}[$self->{list}->{highlight}]}[0];
   my $type = $self->{bibliography}->get_type($key);
   my $properties = $self->{bibliography}->get_properties($key);
-  my $edit = new EditScreen($type, $properties);
-  my $properties = $edit->show($self->{win});
+  my $edit = new EditScreen($self->{bibliography}, $key, $type, $properties);
+  $edit->show($self->{win});
+  # change the list entry
+  ${$self->{list}->{items}}[$self->{list}->{highlight}] =
+    $self->format_entry($self->{bibliography}->{entries_by_key}->{$key});
   $self->draw;
+}
+
+sub format_entry {
+  my $self = shift;
+  my $entry = shift;
+
+  my @list_entry = ();
+  if ($entry->key) { push @list_entry, $entry->key; } else { push @list_entry, "unknown"; }
+  my $authors = Bibliography::format_authors($entry);
+  if ($authors) { push @list_entry, $authors; } else { push @list_entry, "unknown"; }
+  my $year = $entry->get('year');
+  if ($year) { push @list_entry, $year; } else { push @list_entry, ""; }
+  my $title = $entry->get('title');
+  if ($title) { push @list_entry, $title; } else { push @list_entry, "unknown"; }
+  return \@list_entry;
 }
 
 sub open_bibliography {
@@ -55,23 +74,13 @@ sub open_bibliography {
   $self->{bibliography}->read($filename);
 
   for my $entry (@{$self->{bibliography}->{entries}}) {
-    my @list_entry = ();
-    if ($entry->key) { push @list_entry, $entry->key; } else { push @list_entry, "unknown"; }
-    my $authors = Bibliography::format_authors($entry);
-    if ($authors) { push @list_entry, $authors; } else { push @list_entry, "unknown"; }
-    my $year = $entry->get('year');
-    if ($year) { push @list_entry, $year; } else { push @list_entry, ""; }
-    my $title = $entry->get('title');
-    if ($title) { push @list_entry, $title; } else { push @list_entry, "unknown"; }
-    $self->{list}->add_item(\@list_entry);
+    $self->{list}->add_item($self->format_entry($entry));
   }
 
   $num_entries = $#{$self->{bibliography}->{entries}}+1;
   $self->{status}->set("Loaded $num_entries entries.");
 }
 
-sub prompt_for_command {
-}
 #   my $self = shift;
 #   my $prefix = shift;
 # 

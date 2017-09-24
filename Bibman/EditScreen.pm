@@ -13,6 +13,8 @@ use Bibman::TextInput;
 sub new {
   my $class = shift;
   my $self = {
+    bibliography => shift,
+    key => shift,
     type => shift,
     properties => shift,
     focus => undef,
@@ -84,6 +86,7 @@ sub show {
     my ($c, $key) = $win->getchar();
     if (defined($self->{focus})) {
       if (defined($c) && ($c eq "\n")) {
+        $self->{properties}->{$self->{focus}} = $self->{inputs}->{$self->{focus}}->{value};
         $self->{focus} = undef;
         curs_set(0);
       } elsif (defined($key) && ($key eq KEY_RESIZE)) {
@@ -105,7 +108,9 @@ sub show {
           curs_set(1);
           $self->{inputs}->{$self->{focus}}->redraw;
         } elsif ($c eq 'q') {
-          return $self->{properties};
+          my $entry_text = Bibliography::make_bibtex($self->{type}, $self->{key}, $self->{properties});
+          $self->{bibliography}->{entries_by_key}->{$self->{key}}->parse_s($entry_text);
+          return;
         }
       } elsif (defined($key)) {
         if ($key == KEY_UP) {
