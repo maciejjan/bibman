@@ -5,7 +5,19 @@ use warnings;
 use Text::BibTeX;
 
 our $fields = {
-  article => ["author", "journal", "month", "note", "number", "pages", "title", "volume", "year"]
+  article => ["author", "journal", "month", "note", "number", "pages", "title", "volume", "year"],
+  book => ["address", "author", "edition", "editor", "month", "note", "number", "publisher", "series", "title", "volume", "year"],
+  booklet => ["address", "author", "howpublished", "month", "note", "title", "year"],
+  inbook => ["address", "author", "chapter", "edition", "editor", "month", "note", "number", "pages", "publisher", "series", "title", "type", "volume", "year"],
+  incollection => [],
+  inproceedings => ["address", "author", "booktitle", "chapter", "edition", "editor", "month", "note", "number", "pages", "publisher", "series", "title", "type", "volume", "year"],
+  manual => [],
+  thesis => ["address", "author", "month", "note", "school", "title", "type", "year"],
+  phdthesis => ["address", "author", "month", "note", "school", "title", "type", "year"],
+  misc => [],
+  proceedings => [],
+  techreport => [],
+  unupublished => [],
 };
 
 sub new {
