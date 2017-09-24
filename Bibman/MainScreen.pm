@@ -71,21 +71,38 @@ sub open_bibliography {
 }
 
 sub prompt_for_command {
-  my $self = shift;
-  my $prefix = shift;
-
-  my ($maxy, $maxx);
-  $self->{win}->getmaxyx($maxy, $maxx);
-  $self->{win}->addstring($maxy-1, 0, ":$prefix");
-  echo();
-  curs_set(1);
-  $cmd = $self->{win}->getstring();
-  noecho();
-  curs_set(0);
-  $self->{win}->move($maxy-1, 0);
-  $self->{win}->clrtoeol;
-  return $prefix . $cmd;
 }
+#   my $self = shift;
+#   my $prefix = shift;
+# 
+#   my ($maxy, $maxx);
+#   $self->{win}->getmaxyx($maxy, $maxx);
+#   $self->{win}->addstring($maxy-1, 0, ":$prefix");
+#   echo();
+#   curs_set(1);
+# #   $cmd = $self->{win}->getstring();
+#   my $position = length $prefix + 1;
+#   while (1) {
+#     my ($c, $key) = $self->{win}->getchar();
+#     if (defined($c)) {
+#       if ($c eq "\n") {
+#         break;
+#       } else {
+#       }
+#     } elsif (defined($key)) {
+#       if ($key == KEY_LEFT) {
+#         $position--;
+#       } elsif ($key == KEY_RIGHT) {
+#         $position++;
+#       }
+#     }
+#   }
+#   noecho();
+#   curs_set(0);
+#   $self->{win}->move($maxy-1, 0);
+#   $self->{win}->clrtoeol;
+#   return $prefix . $cmd;
+# }
 
 sub execute_cmd {
   my $self = shift;
@@ -129,17 +146,17 @@ sub show {
       } elsif ($c eq 'n') {
         $cmd = 'search-next';
       } elsif ($c eq 'a') {
-        $cmd = $self->prompt_for_command("add ");
+        $cmd = $self->prompt_for_command("add");
       } elsif ($c eq 'e') {
         $cmd = 'edit';
       } elsif ($c eq '/') {
-        $cmd = $self->prompt_for_command("search ");
+        $cmd = $self->prompt_for_command("search");
       } elsif ($c eq "\n") {
         $cmd = 'open-entry';
       } elsif ($c eq 'q') {
         $cmd = 'quit';
       } elsif ($c eq ':') {
-        $cmd = $self->prompt_for_command("");
+        $cmd = $self->prompt_for_command();
       }
     } elsif (defined($key)) {
       if ($key == KEY_UP) {

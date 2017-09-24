@@ -1,14 +1,9 @@
 TODO
 
+- status bar using TextInput
 - "limit" functionality
 - "search" functionality: outside the menu class!
-- adding entries
-  - insert the entry to the bibliography
-  - insert the entry to the entries list
-  - syntax: add TYPE KEY
-  - how to pass the values?
-    - a special screen taking and returning a hash of values
-- editing entries
+- proper scrolling on the edit screen
 - sorting entries
 - keybinding tree
   - binding: key -> command -> function
