@@ -1,6 +1,10 @@
 TODO
 
 - status bar using TextInput
+- undo option
+  - a queue of operations: "add", "edit", "delete" with previous states of the entries
+    ("add": undef, "edit"/"delete": previous properties)
+- saving the bibliography to a file
 - "limit" functionality
 - "search" functionality: outside the menu class!
 - proper scrolling on the edit screen
