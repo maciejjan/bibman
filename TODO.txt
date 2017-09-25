@@ -1,5 +1,6 @@
 TODO
 
+- bug: the column widths in the list do not adapt to added/edited entries
 - key as a normal field? (since not used for indexing)
 - sorting entries (by one of the columns)
 - "search" functionality: outside the menu class!
