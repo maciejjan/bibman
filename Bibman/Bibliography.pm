@@ -38,16 +38,31 @@ sub read {
     push @{$self->{entries}}, $entry;
     $self->{entries_by_key}->{$entry->key} = $entry;
   }
+  $bibfile->close;
 }
 
 sub write {
   my $self = shift;
   my $filename = shift;
-  my $bibfile = Text::BibTeX::File->new($filename, "w+", { BINMODE => 'utf-8' });
+
+  open(my $fh, ">:encoding(utf-8)", $filename);
   for my $entry (@{$self->{entries}}) {
-    $entry->write($bibfile);
+    print $fh $entry->print_s();
   }
+  close $fh;
 }
+
+# TODO Test::BibTeX::Entry::write is currently not used because of unicode problems
+# sub write {
+#   my $self = shift;
+#   my $filename = shift;
+#   my $bibfile = Text::BibTeX::File->new();
+#   $bibfile->open($filename, { MODE => 'w+', BINMODE => 'utf-8' });
+#   for my $entry (@{$self->{entries}}) {
+#     $entry->write($bibfile);
+#   }
+#   $bibfile->close;
+# }
 
 sub add_entry {
   my $self = shift;
