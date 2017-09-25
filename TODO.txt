@@ -1,14 +1,18 @@
 TODO
 
-- deleting entries
+- key as a normal field? (since not used for indexing)
 - sorting entries (by one of the columns)
-- "limit" functionality
 - "search" functionality: outside the menu class!
   - search and limit on specific fields
+    e.g. :search author Janicki
+- "limit" functionality
+  - ListItem objects with "visible" flag
+  - also possible: "selected" flag
 - undo option
   - a queue of operations: "add", "edit", "delete" with previous states of the entries
     ("add": undef, "edit"/"delete": previous properties)
-- proper scrolling on the edit screen
+- proper scrolling (vertical and horizontal) on the edit screen
+- more status messages (e.g. errors)
 - keybinding tree
   - binding: key -> command -> function
   - but first: only binding of single keys without rebinding
