@@ -36,9 +36,13 @@ sub draw {
 sub add_entry {
   my $self = shift;
   my $type = shift;
+  my $key = shift;
 
-  my $edit = new EditScreen($type, {});
-  my $properties = $edit->show($self->{win});
+  $self->{bibliography}->add_entry($type, $key);
+  my $edit = new EditScreen($self->{bibliography}, $key, $type, {});
+  $edit->show($self->{win});
+  my $list_entry = $self->format_entry($self->{bibliography}->{entries_by_key}->{$key});
+  push @{$self->{list}->{items}}, $list_entry;
   $self->draw;
 }
 
@@ -87,6 +91,15 @@ sub open_bibliography {
   $self->{status}->set("Loaded $num_entries entries.");
 }
 
+sub save_bibliography {
+  my $self = shift;
+  my $filename = shift;
+
+  $self->{bibliography}->write($filename);
+  $num_entries = $#{$self->{bibliography}->{entries}}+1;
+  $self->{status}->set("Saved $num_entries entries.");
+}
+
 sub execute_cmd {
   my $self = shift;
   my $cmdline = shift;
@@ -101,6 +114,7 @@ sub execute_cmd {
   elsif ($cmd eq 'go-down')      { return $self->{list}->go_down;          }
   elsif ($cmd eq 'go-to-last')   { return $self->{list}->go_to_last;       }
   elsif ($cmd eq 'open-entry')   { return "open";                          }
+  elsif ($cmd eq 'save')         { $self->save_bibliography(@args);        }
   elsif ($cmd eq 'search')       { return $self->{list}->search(@args);    }
   elsif ($cmd eq 'search-next')  { return $self->{list}->search_next;      }
   else {
@@ -154,6 +168,8 @@ sub show {
             $cmd = 'search-next';
           } elsif ($c eq 'a') {
             $self->enter_command_mode("add");
+          } elsif ($c eq 'a') {
+            $self->enter_command_mode("save");
           } elsif ($c eq 'e') {
             $cmd = 'edit';
           } elsif ($c eq '/') {

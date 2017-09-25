@@ -42,7 +42,20 @@ sub read {
 sub write {
   my $self = shift;
   my $filename = shift;
-  # TODO
+  my $bibfile = Text::BibTeX::File->new($filename, "w+", { BINMODE => 'utf-8' });
+  for my $entry (@{$self->{entries}}) {
+    $entry->write($bibfile);
+  }
+}
+
+sub add_entry {
+  my $self = shift;
+  my $type = shift;
+  my $key = shift;
+
+  my $entry = Text::BibTeX::Entry->new(make_bibtex($type, $key, {}));
+  push @{$self->{entries}}, $entry;
+  $self->{entries_by_key}->{$key} = $entry;
 }
 
 sub get_type {
