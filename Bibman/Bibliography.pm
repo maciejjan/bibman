@@ -2,6 +2,7 @@ package Bibliography;
 
 use strict;
 use warnings;
+use feature 'unicode_strings';
 use Text::BibTeX;
 
 our $fields = {

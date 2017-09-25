@@ -2,6 +2,7 @@ package TextInput;
 
 use strict;
 use warnings;
+use feature 'unicode_strings';
 use Curses;
 
 sub new {

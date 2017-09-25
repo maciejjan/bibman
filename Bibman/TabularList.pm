@@ -2,6 +2,7 @@ package TabularList;
 
 use strict;
 use warnings;
+use feature 'unicode_strings';
 use Curses;
 use List::Util qw( min max );
 

@@ -1,5 +1,8 @@
 package MainScreen;
 
+use strict;
+use warnings;
+use feature 'unicode_strings';
 use Curses;
 use FindBin qw($Bin);
 use lib "$Bin/.";
@@ -10,14 +13,19 @@ use Bibman::TextInput;
 use Bibman::StatusBar;
 
 sub new {
-  $class = shift;
-  $self = {
+  my $class = shift;
+  my $self = {
     list   => new TabularList(4),
     status => new StatusBar(),
     cmd_prompt => new TextInput(""),
     mode   => "normal"               # "normal" or "command"
   };
   bless $self, $class;
+}
+
+sub quit {
+  endwin;
+  exit 0;
 }
 
 sub draw {
@@ -87,7 +95,7 @@ sub open_bibliography {
     $self->{list}->add_item($self->format_entry($entry));
   }
 
-  $num_entries = $#{$self->{bibliography}->{entries}}+1;
+  my $num_entries = $#{$self->{bibliography}->{entries}}+1;
   $self->{status}->set("Loaded $num_entries entries.");
 }
 
@@ -96,7 +104,7 @@ sub save_bibliography {
   my $filename = shift;
 
   $self->{bibliography}->write($filename);
-  $num_entries = $#{$self->{bibliography}->{entries}}+1;
+  my $num_entries = $#{$self->{bibliography}->{entries}}+1;
   $self->{status}->set("Saved $num_entries entries.");
 }
 
@@ -117,6 +125,7 @@ sub execute_cmd {
   elsif ($cmd eq 'save')         { $self->save_bibliography(@args);        }
   elsif ($cmd eq 'search')       { return $self->{list}->search(@args);    }
   elsif ($cmd eq 'search-next')  { return $self->{list}->search_next;      }
+  elsif ($cmd eq 'quit')         { $self->quit;                            }
   else {
   }
 }
@@ -136,6 +145,7 @@ sub enter_command_mode {
 }
 
 sub exit_command_mode {
+  my $self = shift;
   $self->{mode} = "normal";
   curs_set(0);
   $self->draw;
@@ -157,41 +167,41 @@ sub show {
       if ($self->{mode} eq "normal") {
         if (defined($c)) {
           if ($c eq 'k') {
-            $cmd = 'go-up';
+            $self->execute_cmd('go-up');
           } elsif ($c eq 'j') {
-            $cmd = 'go-down';
+            $self->execute_cmd('go-down');
           } elsif ($c eq 'g') {
-            $cmd = 'go-to-first';
+            $self->execute_cmd('go-to-first');
           } elsif ($c eq 'G') {
-            $cmd = 'go-to-last';
+            $self->execute_cmd('go-to-last');
           } elsif ($c eq 'n') {
-            $cmd = 'search-next';
+            $self->execute_cmd('search-next');
           } elsif ($c eq 'a') {
             $self->enter_command_mode("add");
           } elsif ($c eq 'a') {
             $self->enter_command_mode("save");
           } elsif ($c eq 'e') {
-            $cmd = 'edit';
+            $self->execute_cmd('edit');
           } elsif ($c eq '/') {
             $self->enter_command_mode("search");
           } elsif ($c eq "\n") {
-            $cmd = 'open-entry';
+            $self->execute_cmd('open-entry');
           } elsif ($c eq 'q') {
-            $cmd = 'quit';
+            $self->execute_cmd('quit');
           } elsif ($c eq ':') {
             $self->enter_command_mode;
           }
         } elsif (defined($key)) {
           if ($key == KEY_UP) {
-            $cmd = 'go-up';
+            $self->execute_cmd('go-up');
           } elsif ($key == KEY_DOWN) {
-            $cmd = 'go-down';
+            $self->execute_cmd('go-down');
           } elsif ($key == KEY_HOME) {
-            $cmd = 'go-to-first';
+            $self->execute_cmd('go-to-first');
           } elsif ($key == KEY_END) {
-            $cmd = 'go-to-last';
+            $self->execute_cmd('go-to-last');
           } elsif ($key == KEY_ENTER) {
-            $cmd = 'open';
+            $self->execute_cmd('open');
           } elsif ($key == KEY_RESIZE) {
             $self->draw;
           }
@@ -206,11 +216,6 @@ sub show {
           $self->{cmd_prompt}->key_pressed($c, $key);
         }
       }
-    }
-    if ($cmd eq 'quit') {
-      return;
-    } else {
-      $self->execute_cmd($cmd);
     }
   }
 }

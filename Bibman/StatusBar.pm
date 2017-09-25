@@ -1,5 +1,7 @@
 package StatusBar;
 
+use feature 'unicode_strings';
+
 sub new {
   my $class = shift;
   my $self = {
