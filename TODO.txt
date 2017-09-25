@@ -1,14 +1,14 @@
 TODO
 
-- saving the bibliography to a file: unicode issues
+- deleting entries
+- sorting entries (by one of the columns)
+- "limit" functionality
+- "search" functionality: outside the menu class!
+  - search and limit on specific fields
 - undo option
   - a queue of operations: "add", "edit", "delete" with previous states of the entries
     ("add": undef, "edit"/"delete": previous properties)
-- deleting entries
-- "limit" functionality
-- "search" functionality: outside the menu class!
 - proper scrolling on the edit screen
-- sorting entries
 - keybinding tree
   - binding: key -> command -> function
   - but first: only binding of single keys without rebinding

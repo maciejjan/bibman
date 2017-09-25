@@ -32,7 +32,9 @@ sub add_item {
 }
 
 sub delete_item {
-  # TODO
+  my $self = shift;
+  my $idx = shift;
+  splice @{$self->{items}}, $idx, 1;
 }
 
 sub delete_all_items {

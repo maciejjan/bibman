@@ -14,17 +14,19 @@ use Bibman::TextInput;
 sub new {
   my $class = shift;
   my $self = {
-    bibliography => shift,
-    key => shift,
-    type => shift,
-    properties => shift,
+    entry => shift,
+    fields => undef,
+    key => undef,
+    type => undef,
+    properties => undef,
     focus => undef,
     inputs => {},
     highlight => 0
   };
+  $self->{fields} = $Bibliography::fields->{$self->{entry}->type};
+  $self->{properties} = Bibliography::get_properties($self->{entry});
   $self->{left_col_width} = 0;
-  print $self->{type} . "\n";
-  for my $field (@{$Bibliography::fields->{$self->{type}}}) {
+  for my $field (@{$self->{fields}}) {
     $self->{left_col_width} = max($self->{left_col_width}, length $field);
     my $value = $self->{properties}->{$field};
     if (!defined($value)) { 
@@ -39,8 +41,8 @@ sub draw {
   my $self = shift;
   $self->correct_highlight;
   $self->{win}->erase;
-  for (my $i = 0; $i <= $#{$Bibliography::fields->{$self->{type}}}; $i++) {
-    my $field = ${$Bibliography::fields->{$self->{type}}}[$i];
+  for (my $i = 0; $i <= $#{$self->{fields}}; $i++) {
+    my $field = ${$self->{fields}}[$i];
     my $spaces = " " x ($self->{left_col_width} - length $field);
     if ($i == $self->{highlight}) {
       $self->{win}->attron(A_REVERSE);
@@ -50,8 +52,6 @@ sub draw {
       $self->{win}->attroff(A_REVERSE);
     }
     $self->{inputs}->{$field}->draw($self->{win}, $self->{left_col_width}+1, $i, 20);
-  }
-  if (defined($self->{focus})) {
   }
 }
 
@@ -71,8 +71,8 @@ sub correct_highlight {
   my $self = shift;
   if ($self->{highlight} < 0) {
     $self->{highlight} = 0;
-  } elsif ($self->{highlight} > $#{$Bibliography::fields->{$self->{type}}}) {
-    $self->{highlight} = $#{$Bibliography::fields->{$self->{type}}};
+  } elsif ($self->{highlight} > $#{$self->{fields}}) {
+    $self->{highlight} = $#{$self->{fields}};
   }
 }
 
@@ -105,12 +105,14 @@ sub show {
         } elsif ($c eq 'j') {
           $self->go_down;
         } elsif ($c eq "\n") {
-          $self->{focus} = ${$Bibliography::fields->{$self->{type}}}[$self->{highlight}];
+          $self->{focus} = ${$self->{fields}}[$self->{highlight}];
           curs_set(1);
           $self->{inputs}->{$self->{focus}}->redraw;
         } elsif ($c eq 'q') {
-          my $entry_text = Bibliography::make_bibtex($self->{type}, $self->{key}, $self->{properties});
-          $self->{bibliography}->{entries_by_key}->{$self->{key}}->parse_s($entry_text);
+          my $entry_text = Bibliography::make_bibtex($self->{entry}->type, 
+                                                     $self->{entry}->key,
+                                                     $self->{properties});
+          $self->{entry}->parse_s($entry_text);
           return;
         }
       } elsif (defined($key)) {

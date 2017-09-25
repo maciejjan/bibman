@@ -46,24 +46,29 @@ sub add_entry {
   my $type = shift;
   my $key = shift;
 
-  $self->{bibliography}->add_entry($type, $key);
-  my $edit = new EditScreen($self->{bibliography}, $key, $type, {});
+  my $entry = $self->{bibliography}->add_entry($type, $key);
+  my $edit = new EditScreen($entry);
   $edit->show($self->{win});
-  my $list_entry = $self->format_entry($self->{bibliography}->{entries_by_key}->{$key});
+  my $list_entry = $self->format_entry($entry);
   push @{$self->{list}->{items}}, $list_entry;
   $self->draw;
+  $self->{list}->go_to_last;
 }
 
 sub edit_entry {
   my $self = shift;
-  my $key = ${${$self->{list}->{items}}[$self->{list}->{highlight}]}[0];
-  my $type = $self->{bibliography}->get_type($key);
-  my $properties = $self->{bibliography}->get_properties($key);
-  my $edit = new EditScreen($self->{bibliography}, $key, $type, $properties);
+  my $idx = $self->{list}->{highlight};
+  my $entry = ${$self->{bibliography}->{entries}}[$idx];
+  my $edit = new EditScreen($entry);
   $edit->show($self->{win});
-  # change the list entry
-  ${$self->{list}->{items}}[$self->{list}->{highlight}] =
-    $self->format_entry($self->{bibliography}->{entries_by_key}->{$key});
+  ${$self->{list}->{items}}[$idx] = $self->format_entry($entry);
+  $self->draw;
+}
+
+sub delete_entry {
+  my $self = shift;
+  $self->{bibliography}->delete_entry($self->{list}->{highlight});
+  $self->{list}->delete_item($self->{list}->{highlight});
   $self->draw;
 }
 
@@ -116,6 +121,7 @@ sub execute_cmd {
   my $cmd = shift @args;
 
   if    ($cmd eq 'add')          { return $self->add_entry(@args);         }
+  elsif ($cmd eq 'delete')       { return $self->delete_entry;             }
   elsif ($cmd eq 'edit')         { return $self->edit_entry;               }
   elsif ($cmd eq 'go-up')        { return $self->{list}->go_up;            }
   elsif ($cmd eq 'go-to-first')  { return $self->{list}->go_to_first;      }
@@ -178,8 +184,10 @@ sub show {
             $self->execute_cmd('search-next');
           } elsif ($c eq 'a') {
             $self->enter_command_mode("add");
-          } elsif ($c eq 'a') {
+          } elsif ($c eq 's') {
             $self->enter_command_mode("save");
+          } elsif ($c eq 'd') {
+            $self->execute_cmd('delete');
           } elsif ($c eq 'e') {
             $self->execute_cmd('edit');
           } elsif ($c eq '/') {

@@ -24,8 +24,7 @@ our $fields = {
 sub new {
   my $class = shift;
   my $self = {
-    entries => [],
-    entries_by_key => {}
+    entries => []
   };
   bless $self, $class;
 }
@@ -36,7 +35,6 @@ sub read {
   my $bibfile = Text::BibTeX::File->new($filename, { BINMODE => 'utf-8' });
   while (my $entry = Text::BibTeX::Entry->new($bibfile)) {
     push @{$self->{entries}}, $entry;
-    $self->{entries_by_key}->{$entry->key} = $entry;
   }
   $bibfile->close;
 }
@@ -71,20 +69,24 @@ sub add_entry {
 
   my $entry = Text::BibTeX::Entry->new(make_bibtex($type, $key, {}));
   push @{$self->{entries}}, $entry;
-  $self->{entries_by_key}->{$key} = $entry;
+  return $entry;
+}
+
+sub delete_entry {
+  my $self = shift;
+  my $idx = shift;
+  splice @{$self->{entries}}, $idx, 1;
 }
 
 sub get_type {
   my $self = shift;
-  my $key = shift;
-  return $self->{entries_by_key}->{$key}->type;
+  my $idx = shift;
+  return ${$self->{entries}}[$idx]->type;
 }
 
 sub get_properties {
-  my $self = shift;
-  my $key = shift;
+  my $entry = shift;
 
-  my $entry = $self->{entries_by_key}->{$key};
   my %properties = ();
   for my $field (@{$fields->{$entry->type}}) {
     $properties{$field} = $entry->get($field);
