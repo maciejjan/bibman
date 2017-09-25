@@ -201,7 +201,7 @@ sub correct_top {
     $self->{top} = $self->{highlight}-$self->{height};
   }
   if ($self->{top} + $self->{height} > $#{$self->{items}}) {
-    $self->{top} = $#{$self->{items}}-$self->{height};
+    $self->{top} = max(0, $#{$self->{items}}-$self->{height});
   }
 }
 
