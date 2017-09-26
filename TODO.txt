@@ -8,7 +8,7 @@ TODO
 - "search" functionality: outside the menu class!
   - search and limit on specific fields
     e.g. :search author Janicki
-- "limit" functionality
+- "filter" functionality
   - ListItem objects with "visible" flag
   - also possible: "selected" flag
 - undo option
@@ -17,6 +17,7 @@ TODO
 - more status messages (e.g. errors)
 - autocompletion of commands and file names
   - (in TextInput)
+  - also values (words in titles, author names etc.)
 - keybinding tree
   - binding: key -> command -> function
   - but first: only binding of single keys without rebinding

@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use feature 'unicode_strings';
 use Curses;
+use File::Basename;
 use FindBin qw($Bin);
 use lib "$Bin/.";
 use Bibman::Bibliography;
@@ -83,10 +84,21 @@ sub format_entry {
   return \@list_entry;
 }
 
+sub open_entry {
+  my $self = shift;
+  # TODO various file extensions: pdf, ps, ...?
+  my $entry = ${$self->{bibliography}->{entries}}[$self->{list}->{highlight}];
+  my $filename = dirname($self->{filename}) . "/" . $entry->key . ".pdf";
+  if (-e $filename) {
+    system "rifle $filename";
+  }
+}
+
 sub open_bibliography {
   my $self = shift;
   my $filename = shift;
 
+  $self->{filename} = $filename;
   $self->{list}->delete_all_items;
 
   $self->{bibliography} = new Bibliography();
@@ -123,7 +135,7 @@ sub execute_cmd {
   elsif ($cmd eq 'go-to-first')  { return $self->{list}->go_to_first;      }
   elsif ($cmd eq 'go-down')      { return $self->{list}->go_down;          }
   elsif ($cmd eq 'go-to-last')   { return $self->{list}->go_to_last;       }
-  elsif ($cmd eq 'open-entry')   { return "open";                          }
+  elsif ($cmd eq 'open-entry')   { $self->open_entry;                      }
   elsif ($cmd eq 'save')         { $self->save_bibliography(@args);        }
   elsif ($cmd eq 'search')       { return $self->{list}->search(@args);    }
   elsif ($cmd eq 'search-next')  { return $self->{list}->search_next;      }

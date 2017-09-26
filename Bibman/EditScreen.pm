@@ -19,6 +19,7 @@ sub new {
     properties => undef,
     focus => undef,
     inputs => undef,
+    status => new StatusBar(),
     highlight => 0
   };
   $self->{properties} = Bibliography::get_properties($self->{entry});
@@ -46,6 +47,8 @@ sub draw {
   my $self = shift;
   $self->correct_highlight;
   $self->{win}->erase;
+  my ($maxy, $maxx);
+  $self->{win}->getmaxyx($maxy, $maxx);
   for (my $i = 0; $i <= $#{$self->{fields}}; $i++) {
     my $field = ${$self->{fields}}[$i];
     my $spaces = " " x ($self->{left_col_width} - length $field);
@@ -58,6 +61,7 @@ sub draw {
     }
     $self->{inputs}->{$field}->draw($self->{win}, $self->{left_col_width}+1, $i, 20);
   }
+  $self->{status}->draw($self->{win}, $maxy-1);
 }
 
 sub change_type {
@@ -111,8 +115,15 @@ sub show {
     if (defined($focus)) {
       if (defined($c) && ($c eq "\n")) {
         if ($focus eq "entry_type") {
-          $self->change_type($self->{inputs}->{$focus}->{value});
-          $self->draw;
+          my $new_type = $self->{inputs}->{$focus}->{value};
+          if (defined($Bibliography::fields->{$new_type})) {
+            $self->change_type($new_type);
+            $self->draw;
+          } else {
+            $self->{status}->set("Unknown type: $new_type");
+            $self->{inputs}->{$focus}->{value} = $self->{properties}->{entry_type};
+            $self->{inputs}->{$focus}->redraw;
+          }
         } else {
           $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
         }

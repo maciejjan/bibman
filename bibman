@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 
 use Curses;
-use File::Basename;
 use feature 'unicode_strings';
 
 use FindBin qw($Bin);
