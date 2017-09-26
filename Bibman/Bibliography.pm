@@ -67,7 +67,10 @@ sub add_entry {
   my $type = shift;
   my $key = shift;
 
-  my $entry = Text::BibTeX::Entry->new(make_bibtex($type, $key, {}));
+  my $entry = Text::BibTeX::Entry->new();
+  $entry->set_metatype(Text::BibTeX::BTE_REGULAR);
+  $entry->set_type($type);
+  $entry->set_key($key);
   push @{$self->{entries}}, $entry;
   return $entry;
 }
@@ -94,20 +97,15 @@ sub get_properties {
   return \%properties;
 }
 
-sub make_bibtex {
-  my $type = shift;
-  my $key = shift;
+sub set_properties {
+  my $entry = shift;
   my $properties_ref = shift;
   my %properties = %$properties_ref;
-
-  my $result = "@" . $type . "{$key";
-  for my $key (sort keys %properties) {
+  for my $key (keys %properties) {
     if (defined($properties{$key})) {
-      $result .= ",\n  $key = {$properties{$key}}";
+      $entry->set($key, $properties{$key});
     }
   }
-  $result .= "\n}";
-  return $result;
 }
 
 sub format_authors {

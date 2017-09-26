@@ -10,15 +10,13 @@ sub new {
   my $class = shift;
   my $self = {
     columns => shift,
-    col_widths => [],
+    col_widths => undef,
     highlight => 0,
     top => 0,
     items => []
   };
-  for (my $i = 0; $i < $self->{columns}; $i++) {
-    push @{$self->{col_widths}}, 0;
-  }
   bless $self, $class;
+  $self->reset_col_widths;
   return $self;
 }
 
@@ -31,10 +29,19 @@ sub add_item {
   push @{$self->{items}}, $line;
 }
 
+sub update_item {
+  my $self = shift;
+  my $idx = shift;
+  my $item = shift;
+  ${$self->{items}}[$idx] = $item;
+  $self->update_col_widths;
+}
+
 sub delete_item {
   my $self = shift;
   my $idx = shift;
   splice @{$self->{items}}, $idx, 1;
+  $self->update_col_widths;
 }
 
 sub delete_all_items {
@@ -43,6 +50,25 @@ sub delete_all_items {
   $self->{col_widths} = [];
   for (my $i = 0; $i < $self->{columns}; $i++) {
     push @{$self->{col_widths}}, 0;
+  }
+}
+
+sub reset_col_widths {
+  my $self = shift;
+  $self->{col_widths} = [];
+  for (my $j = 0; $j <= $self->{columns}; $j++) {
+    ${$self->{col_widths}}[$j] = 0;
+  }
+}
+
+sub update_col_widths {
+  my $self = shift;
+  $self->reset_col_widths;
+  for (my $i = 0; $i <= $#{$self->{items}}; $i++) {
+    for (my $j = 0; $j < $self->{columns}; $j++) {
+      ${$self->{col_widths}}[$j] = max(${$self->{col_widths}}[$j],
+                                       length ${${$self->{items}}[$i]}[$j]);
+    }
   }
 }
 

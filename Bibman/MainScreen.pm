@@ -49,8 +49,7 @@ sub add_entry {
   my $entry = $self->{bibliography}->add_entry($type, $key);
   my $edit = new EditScreen($entry);
   $edit->show($self->{win});
-  my $list_entry = $self->format_entry($entry);
-  push @{$self->{list}->{items}}, $list_entry;
+  $self->{list}->add_item(format_entry($entry));
   $self->draw;
   $self->{list}->go_to_last;
 }
@@ -61,7 +60,7 @@ sub edit_entry {
   my $entry = ${$self->{bibliography}->{entries}}[$idx];
   my $edit = new EditScreen($entry);
   $edit->show($self->{win});
-  ${$self->{list}->{items}}[$idx] = $self->format_entry($entry);
+  $self->{list}->update_item($idx, format_entry($entry));
   $self->draw;
 }
 
@@ -73,7 +72,6 @@ sub delete_entry {
 }
 
 sub format_entry {
-  my $self = shift;
   my $entry = shift;
 
   my @list_entry = ();
@@ -97,7 +95,7 @@ sub open_bibliography {
   $self->{bibliography}->read($filename);
 
   for my $entry (@{$self->{bibliography}->{entries}}) {
-    $self->{list}->add_item($self->format_entry($entry));
+    $self->{list}->add_item(format_entry($entry));
   }
 
   my $num_entries = $#{$self->{bibliography}->{entries}}+1;
@@ -133,6 +131,7 @@ sub execute_cmd {
   elsif ($cmd eq 'search-next')  { return $self->{list}->search_next;      }
   elsif ($cmd eq 'quit')         { $self->quit;                            }
   else {
+    $self->{status}->set("Unknown command: $cmd");
   }
 }
 

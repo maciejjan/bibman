@@ -109,10 +109,7 @@ sub show {
           curs_set(1);
           $self->{inputs}->{$self->{focus}}->redraw;
         } elsif ($c eq 'q') {
-          my $entry_text = Bibliography::make_bibtex($self->{entry}->type, 
-                                                     $self->{entry}->key,
-                                                     $self->{properties});
-          $self->{entry}->parse_s($entry_text);
+          Bibliography::set_properties($self->{entry}, $self->{properties});
           return;
         }
       } elsif (defined($key)) {
