@@ -16,15 +16,21 @@ sub new {
   my $self = {
     entry => shift,
     fields => undef,
-    key => undef,
-    type => undef,
     properties => undef,
     focus => undef,
-    inputs => {},
+    inputs => undef,
     highlight => 0
   };
-  $self->{fields} = $Bibliography::fields->{$self->{entry}->type};
   $self->{properties} = Bibliography::get_properties($self->{entry});
+  my @fields = ("entry_type", "key", @{$Bibliography::fields->{$self->{entry}->type}});
+  $self->{fields} = \@fields;
+  reset_inputs($self);
+  bless $self, $class;
+}
+
+sub reset_inputs {
+  my $self = shift;
+  $self->{inputs} = {};
   $self->{left_col_width} = 0;
   for my $field (@{$self->{fields}}) {
     $self->{left_col_width} = max($self->{left_col_width}, length $field);
@@ -34,7 +40,6 @@ sub new {
     }
     $self->{inputs}->{$field} = new TextInput($value);
   }
-  bless $self, $class;
 }
 
 sub draw {
@@ -53,6 +58,23 @@ sub draw {
     }
     $self->{inputs}->{$field}->draw($self->{win}, $self->{left_col_width}+1, $i, 20);
   }
+}
+
+sub change_type {
+  my $self = shift;
+  my $new_type = shift;
+  my @fields = ("entry_type", "key", @{$Bibliography::fields->{$new_type}});
+#   my %new_properties = ();
+#   for my $key (@fields) {
+#     if (defined($self->{properties}->{$key})) {
+#       $new_properties{$key} = $self->{properties}->{$key};
+#     }
+#   }
+  $self->{fields} = \@fields;
+#   $self->{properties} = \%new_properties;
+  $self->{properties}->{entry_type} = $new_type;
+  $self->{entry}->set_type($new_type);
+  $self->reset_inputs;
 }
 
 sub go_up {
@@ -85,9 +107,15 @@ sub show {
 
   while (1) {
     my ($c, $key) = $win->getchar();
-    if (defined($self->{focus})) {
+    my $focus = $self->{focus};
+    if (defined($focus)) {
       if (defined($c) && ($c eq "\n")) {
-        $self->{properties}->{$self->{focus}} = $self->{inputs}->{$self->{focus}}->{value};
+        if ($focus eq "entry_type") {
+          $self->change_type($self->{inputs}->{$focus}->{value});
+          $self->draw;
+        } else {
+          $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
+        }
         $self->{focus} = undef;
         curs_set(0);
       } elsif (defined($key) && ($key eq KEY_RESIZE)) {

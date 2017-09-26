@@ -65,12 +65,12 @@ sub write {
 sub add_entry {
   my $self = shift;
   my $type = shift;
-  my $key = shift;
+#   my $key = shift;
 
   my $entry = Text::BibTeX::Entry->new();
   $entry->set_metatype(Text::BibTeX::BTE_REGULAR);
   $entry->set_type($type);
-  $entry->set_key($key);
+#   $entry->set_key($key);
   push @{$self->{entries}}, $entry;
   return $entry;
 }
@@ -91,6 +91,8 @@ sub get_properties {
   my $entry = shift;
 
   my %properties = ();
+  $properties{entry_type} = $entry->type;
+  $properties{key} = $entry->key;
   for my $field (@{$fields->{$entry->type}}) {
     $properties{$field} = $entry->get($field);
   }
@@ -101,9 +103,15 @@ sub set_properties {
   my $entry = shift;
   my $properties_ref = shift;
   my %properties = %$properties_ref;
-  for my $key (keys %properties) {
-    if (defined($properties{$key})) {
-      $entry->set($key, $properties{$key});
+  if (defined($properties{entry_type})) {
+    $entry->set_type($properties{entry_type});
+  }
+  if (defined($properties{key})) {
+    $entry->set_key($properties{key});
+  }
+  for my $field (@{$fields->{$entry->type}}) {
+    if (defined($properties{$field}) && ($properties{$field})) {
+      $entry->set($field, $properties{$field});
     }
   }
 }

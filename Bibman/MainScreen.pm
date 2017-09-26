@@ -43,10 +43,8 @@ sub draw {
 
 sub add_entry {
   my $self = shift;
-  my $type = shift;
-  my $key = shift;
 
-  my $entry = $self->{bibliography}->add_entry($type, $key);
+  my $entry = $self->{bibliography}->add_entry("article");
   my $edit = new EditScreen($entry);
   $edit->show($self->{win});
   $self->{list}->add_item(format_entry($entry));
@@ -182,7 +180,7 @@ sub show {
           } elsif ($c eq 'n') {
             $self->execute_cmd('search-next');
           } elsif ($c eq 'a') {
-            $self->enter_command_mode("add");
+            $self->execute_cmd('add');
           } elsif ($c eq 's') {
             $self->enter_command_mode("save");
           } elsif ($c eq 'd') {

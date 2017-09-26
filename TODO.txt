@@ -1,7 +1,9 @@
 TODO
 
-- bug: unicode problems after adding entry
-- key as a normal field? (since not used for indexing)
+- optional and required fields
+- do not allow duplicate keys?
+- proper scrolling (vertical and horizontal) on the edit screen
+- proper length setting for TextInputs (depending on the window width)
 - sorting entries (by one of the columns)
 - "search" functionality: outside the menu class!
   - search and limit on specific fields
@@ -12,9 +14,9 @@ TODO
 - undo option
   - a queue of operations: "add", "edit", "delete" with previous states of the entries
     ("add": undef, "edit"/"delete": previous properties)
-- proper scrolling (vertical and horizontal) on the edit screen
 - more status messages (e.g. errors)
 - autocompletion of commands and file names
+  - (in TextInput)
 - keybinding tree
   - binding: key -> command -> function
   - but first: only binding of single keys without rebinding
