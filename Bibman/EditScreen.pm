@@ -121,8 +121,7 @@ sub show {
             $self->draw;
           } else {
             $self->{status}->set("Unknown type: $new_type");
-            $self->{inputs}->{$focus}->{value} = $self->{properties}->{entry_type};
-            $self->{inputs}->{$focus}->redraw;
+            $self->{inputs}->{$focus}->set_value($self->{properties}->{entry_type});
           }
         } else {
           $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};

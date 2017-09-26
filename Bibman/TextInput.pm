@@ -32,6 +32,14 @@ sub redraw {
   $self->{win}->move($self->{y}, $self->{x} + $self->{pos});
 }
 
+sub set_value {
+  my $self = shift;
+  my $value = shift;
+  $self->{value} = $value;
+  $self->{pos} = length $value;
+  $self->redraw;
+}
+
 sub key_pressed {
   my $self = shift;
   my $c = shift;
