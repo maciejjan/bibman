@@ -13,7 +13,7 @@ sub new {
     col_widths => undef,
     highlight => 0,
     top => 0,
-    items => [],
+    items => []
   };
   bless $self, $class;
   $self->reset_col_widths;
@@ -22,18 +22,20 @@ sub new {
 
 sub add_item {
   my $self = shift;
-  my $line = shift;
-  for (my $i = 0; $i <= $#$line; $i++) {
-    ${$self->{col_widths}}[$i] = max(${$self->{col_widths}}[$i], length ${$line}[$i]);
-  }
-  push @{$self->{items}}, $line;
+  my $values = shift;
+  my $item = {
+    values => $values,
+    visible => 1
+  };
+  $self->update_col_widths($values);
+  push @{$self->{items}}, $item;
 }
 
 sub update_item {
   my $self = shift;
   my $idx = shift;
-  my $item = shift;
-  ${$self->{items}}[$idx] = $item;
+  my $values = shift;
+  ${$self->{items}}[$idx]->{values} = $values;
   $self->update_col_widths;
 }
 
@@ -47,43 +49,49 @@ sub delete_item {
 sub delete_all_items {
   my $self = shift;
   $self->{items} = [];
-  $self->{col_widths} = [];
-  for (my $i = 0; $i < $self->{columns}; $i++) {
-    push @{$self->{col_widths}}, 0;
-  }
+  $self->reset_col_widths;
 }
 
 sub reset_col_widths {
   my $self = shift;
   $self->{col_widths} = [];
-  for (my $j = 0; $j <= $self->{columns}; $j++) {
+  for (my $j = 0; $j < $self->{columns}; $j++) {
     ${$self->{col_widths}}[$j] = 0;
   }
 }
 
 sub update_col_widths {
   my $self = shift;
-  $self->reset_col_widths;
-  for (my $i = 0; $i <= $#{$self->{items}}; $i++) {
+  my $values = shift;
+  # if called without a parameter -> check all items
+  if (!defined($values)) {
+    $self->reset_col_widths;
+    for my $item (@{$self->{items}}) {
+      $self->update_col_widths($item->{values});
+    }
+  } 
+  # else check for one item
+  else {
     for (my $j = 0; $j < $self->{columns}; $j++) {
       ${$self->{col_widths}}[$j] = max(${$self->{col_widths}}[$j],
-                                       length ${${$self->{items}}[$i]}[$j]);
+                                       length ${$values}[$j]);
     }
   }
 }
 
 sub format_item {
   my $self = shift;
-  my $line = shift;
+  my $item = shift;
   my @formatted_line = ();
   my $length = 0;
-  for (my $i = 0; $i < $#$line; $i++) {
-    push @formatted_line, $$line[$i];
-    my $spacing_length = ${$self->{col_widths}}[$i] + 1 - length $$line[$i];
+  for (my $i = 0; $i < $#{$item->{values}}; $i++) {
+    my $value = ${$item->{values}}[$i];
+    push @formatted_line, $value;
+    my $spacing_length = ${$self->{col_widths}}[$i] + 1 - length $value;
     push @formatted_line, " " x $spacing_length;
-    $length += length($$line[$i]) + $spacing_length;
+    $length += length($value) + $spacing_length;
   }
-  push @formatted_line, $$line[$#$line];
+  push @formatted_line, ${$item->{values}}[-1];
   my $trailing_length = $self->{width} - $length;
   if ($trailing_length > 0) {
     push @formatted_line, " " x $trailing_length;
@@ -97,93 +105,57 @@ sub format_item {
 
 sub go_up {
   my $self = shift;
-  $self->{highlight}--;
-  $self->redraw;
+  $self->go_to_item($self->prev_visible($self->{highlight}-1));
 }
 
 sub go_down {
   my $self = shift;
-  $self->{highlight}++;
-  $self->redraw;
+  $self->go_to_item($self->next_visible($self->{highlight}+1));
 }
 
 sub go_to_first {
   my $self = shift;
-  $self->{highlight} = 0;
-  $self->redraw;
+  $self->go_to_item($self->next_visible(0));
 }
 
 sub go_to_last {
   my $self = shift;
-  $self->{highlight} = $#{$self->{items}};
-  $self->redraw;
+  $self->go_to_item($self->prev_visible($#{$self->{items}}));
+}
+
+sub next_visible {
+  my $self = shift;
+  my $idx = shift;
+  while (($idx <= $#{$self->{items}}) && (!${$self->{items}}[$idx]->{visible})) {
+    $idx++;
+  }
+  if ($idx <= $#{$self->{items}}) {
+    return $idx;
+  } else {
+    return undef;
+  }
+}
+
+sub prev_visible {
+  my $self = shift;
+  my $idx = shift;
+  while (($idx >= 0) && (!${$self->{items}}[$idx]->{visible})) {
+    $idx--;
+  }
+  if ($idx >= 0) {
+    return $idx;
+  } else {
+    return undef;
+  }
 }
 
 sub go_to_item {
   my $self = shift;
   my $idx = shift;
-  $self->{highlight} = $idx;
-  $self->redraw;
-}
-
-sub search {
-  my $self = shift;
-  my $pattern = shift;
-  if ($pattern) {
-    $self->{search_pattern} = $pattern;
-    return $self->search_next;
-  } else {
-    return "no pattern";
+  if (defined($idx)) {
+    $self->{highlight} = $idx;
+    $self->redraw;
   }
-}
-
-sub search_next {
-  my $self = shift;
-  if (!defined($self->{search_pattern})) {
-    return;
-  }
-  my $found_idx = undef;
-  for (my $i = $self->{highlight}+1;
-       $i <= $#{$self->{items}} && !defined($found_idx); 
-       $i++) {
-    for (my $j = 0;
-         $j < $self->{columns} && !defined($found_idx);
-         $j++) {
-      if (${${$self->{items}}[$i]}[$j] =~ m/$self->{search_pattern}/) {
-        $found_idx = $i;
-      }
-    }
-  }
-  if (defined($found_idx)) {
-    $self->go_to_item($found_idx);
-  } else {
-    for (my $i = 0;
-         $i <= $self->{highlight} && !defined($found_idx); 
-         $i++) {
-      for (my $j = 0;
-           $j < $self->{columns} && !defined($found_idx);
-           $j++) {
-        if (${${$self->{items}}[$i]}[$j] =~ m/$self->{search_pattern}/) {
-          $found_idx = $i;
-        }
-      }
-    }
-    if (defined($found_idx)) {
-      $self->go_to_item($found_idx);
-    } else { 
-      return "Pattern: \"$self->{search_pattern}\" not found.";
-    }
-  }
-}
-
-sub search_prev {
-}
-
-sub filter {
-  my $self = shift;
-  my $visible_items =  shift;
-  $self->{visible_items} = $visible_items;
-  $self->redraw;
 }
 
 sub draw {
@@ -200,44 +172,35 @@ sub redraw {
   my $self = shift;
   my $win = $self->{win};
 
-  $self->correct_highlight;
   $self->correct_top;
   my $cur_y = 0;
-  my $max_idx = min($#{$self->{items}}, $self->{top} + $self->{height});
-  for (my $i = $self->{top}; $i <= $#{$self->{items}; $i++) {
-    next if (!(${$self->{items}}[$i]->{visible}));
-    if ($self->{highlight} == $i) {
+  my $idx = $self->{top};
+  while (($cur_y <= $self->{height}) && ($idx <= $#{$self->{items}})) {
+    if ($self->{highlight} == $idx) {
       $win->attron(A_REVERSE);
     }
-    $win->addstring($cur_y, 0, $self->format_item(${$self->{items}}[$i]));
-    if ($self->{highlight} == $i) {
+    $win->addstring($cur_y, 0, $self->format_item(${$self->{items}}[$idx]));
+    if ($self->{highlight} == $idx) {
       $win->attroff(A_REVERSE);
     }
     $cur_y++;
-  }
-}
-
-sub correct_highlight {
-  my $self = shift;
-  if ($self->{highlight} < 0) {
-    $self->{highlight} = 0;
-  } elsif ($self->{highlight} > $#{$self->{items}}) {
-    $self->{highlight} = $#{$self->{items}};
+    $idx = $self->next_visible(++$idx);
+    last if (!defined($idx));
   }
 }
 
 # make sure that the highlighted item is visible
 sub correct_top {
   my $self = shift;
-  if ($self->{highlight} < $self->{top}) {
-    $self->{top} = $self->{highlight};
+  my $new_top = $self->{highlight};
+  my $num_entries = 0;
+  while (($num_entries < $self->{height}) && ($new_top > $self->{top})) {
+    my $new_new_top = $self->prev_visible(--$new_top);
+    last if (!defined($new_new_top));
+    $new_top = $new_new_top;
+    $num_entries++;
   }
-  elsif ($self->{highlight} > $self->{top}+$self->{height}) {
-    $self->{top} = $self->{highlight}-$self->{height};
-  }
-  if ($self->{top} + $self->{height} > $#{$self->{items}}) {
-    $self->{top} = max(0, $#{$self->{items}}-$self->{height});
-  }
+  $self->{top} = $new_top;
 }
 
 1;

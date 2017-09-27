@@ -19,7 +19,11 @@ sub new {
     list   => new TabularList(4),
     status => new StatusBar(),
     cmd_prompt => new TextInput(""),
-    mode   => "normal"               # "normal" or "command"
+    mode   => "normal",               # "normal" or "command"
+    search_field => undef,
+    search_pattern => undef,
+    filter_field => undef,
+    filter_pattern => undef
   };
   bless $self, $class;
 }
@@ -94,6 +98,112 @@ sub open_entry {
   }
 }
 
+sub get_search_args {
+  if ($#_ > 0) {
+    return $_[0], $_[1];
+  } else {
+    return undef, $_[0];
+  }
+}
+
+sub set_search_args {
+  my $self = shift;
+  my ($field, $pattern) = get_search_args(@_);
+  $self->{search_field} = $field;
+  $self->{search_pattern} = $pattern;
+  if (!defined($self->{search_pattern})) {
+    $self->{search_pattern} = "";
+  }
+}
+
+sub search {
+  my $self = shift;
+  $self->set_search_args(@_);
+  $self->search_next;
+}
+
+# sub backward_search {
+#   my $self = shift;
+#   $self->set_search_args(@_);
+#   $self->search_prev;
+# }
+
+sub search_next {
+  my $self = shift;
+  my $idx = $self->{list}->{highlight};
+  do {
+    $idx++;
+    if ($idx > $#{$self->{list}->{items}}) {
+      $idx = 0;
+    }
+    $idx = $self->{list}->next_visible($idx);
+    last if (!defined($idx));
+  } while (!($self->match($idx, $self->{search_field}, $self->{search_pattern})
+             || $idx == $self->{list}->{highlight}));
+  $self->{list}->go_to_item($idx);
+}
+
+sub search_prev {
+  my $self = shift;
+  my $idx = $self->{list}->{highlight};
+  do {
+    $idx--;
+    if ($idx < 0) {
+      $idx = $#{$self->{list}->{items}};
+    }
+    $idx = $self->{list}->prev_visible($idx);
+    last if (!defined($idx));
+  } while (!($self->match($idx, $self->{search_field}, $self->{search_pattern})
+             || $idx == $self->{list}->{highlight}));
+  $self->{list}->go_to_item($idx);
+}
+
+sub match {
+  my $self = shift;
+  my $idx = shift;
+  my $field = shift;
+  my $pattern = shift;
+  my $entry = ${$self->{bibliography}->{entries}}[$idx];
+  if (defined($field)) {
+    my $value = Bibliography::get_property($entry, $field);
+    if ((defined($value)) && ($value =~ /$pattern/)) {
+      return 1;
+    }
+  } else {
+    for (my $i = 0; $i < $self->{list}->{columns}; $i++) {
+      my $list_item = ${$self->{list}->{items}}[$idx];
+      if (${$list_item->{values}}[$i] =~ /$pattern/) {
+        return 1;
+      }
+    }
+  }
+  return 0;
+}
+
+sub filter {
+  my $self = shift;
+  my ($field, $pattern) = get_search_args(@_);
+  if (!defined($pattern) || (!$pattern)) {
+    for my $item (@{$self->{list}->{items}}) {
+      $item->{visible} = 1;
+    }
+  } else {
+    $self->{filter_field} = $field;
+    $self->{filter_pattern} = $pattern;
+    for (my $i = 0; $i <= $#{$self->{bibliography}->{entries}}; $i++) {
+      my $item = ${$self->{list}->{items}}[$i];
+      if ($self->match($i, $self->{filter_field}, $self->{filter_pattern})) {
+        $item->{visible} = 1;
+      } else {
+        $item->{visible} = 0;
+      }
+    }
+  }
+  $self->draw;
+  $self->{status}->set("blah: " . ${$self->{list}->{items}}[0]->{visible});
+}
+
+
 sub open_bibliography {
   my $self = shift;
   my $filename = shift;
@@ -121,17 +231,6 @@ sub save_bibliography {
   $self->{status}->set("Saved $num_entries entries.");
 }
 
-sub filter {
-  my $self = shift;
-  my ($pattern, $field);
-  if ($#_ > 0) {
-    $field = shift;
-    $pattern = shift;
-  } else {
-    $pattern = shift;
-  }
-}
-
 sub execute_cmd {
   my $self = shift;
   my $cmdline = shift;
@@ -139,17 +238,19 @@ sub execute_cmd {
   my @args = split /\s+/, $cmdline;
   my $cmd = shift @args;
 
-  if    ($cmd eq 'add')          { return $self->add_entry(@args);         }
-  elsif ($cmd eq 'delete')       { return $self->delete_entry;             }
-  elsif ($cmd eq 'edit')         { return $self->edit_entry;               }
-  elsif ($cmd eq 'go-up')        { return $self->{list}->go_up;            }
-  elsif ($cmd eq 'go-to-first')  { return $self->{list}->go_to_first;      }
-  elsif ($cmd eq 'go-down')      { return $self->{list}->go_down;          }
-  elsif ($cmd eq 'go-to-last')   { return $self->{list}->go_to_last;       }
+  if    ($cmd eq 'add')          { $self->add_entry(@args);                }
+  elsif ($cmd eq 'delete')       { $self->delete_entry;                    }
+  elsif ($cmd eq 'edit')         { $self->edit_entry;                      }
+  elsif ($cmd eq 'filter')       { $self->filter(@args);                   }
+  elsif ($cmd eq 'go-up')        { $self->{list}->go_up;                   }
+  elsif ($cmd eq 'go-to-first')  { $self->{list}->go_to_first;             }
+  elsif ($cmd eq 'go-down')      { $self->{list}->go_down;                 }
+  elsif ($cmd eq 'go-to-last')   { $self->{list}->go_to_last;              }
   elsif ($cmd eq 'open-entry')   { $self->open_entry;                      }
   elsif ($cmd eq 'save')         { $self->save_bibliography(@args);        }
-  elsif ($cmd eq 'search')       { return $self->{list}->search(@args);    }
-  elsif ($cmd eq 'search-next')  { return $self->{list}->search_next;      }
+  elsif ($cmd eq 'search')       { $self->search(@args);                   }
+  elsif ($cmd eq 'search-next')  { $self->search_next;                     }
+  elsif ($cmd eq 'search-prev')  { $self->search_prev;                     }
   elsif ($cmd eq 'quit')         { $self->quit;                            }
   else {
     $self->{status}->set("Unknown command: $cmd");
@@ -202,12 +303,16 @@ sub show {
             $self->execute_cmd('go-to-last');
           } elsif ($c eq 'n') {
             $self->execute_cmd('search-next');
+          } elsif ($c eq 'N') {
+            $self->execute_cmd('search-prev');
           } elsif ($c eq 'a') {
             $self->execute_cmd('add');
           } elsif ($c eq 's') {
             $self->enter_command_mode("save");
           } elsif ($c eq 'd') {
             $self->execute_cmd('delete');
+          } elsif ($c eq 'f') {
+            $self->enter_command_mode("filter");
           } elsif ($c eq 'e') {
             $self->execute_cmd('edit');
           } elsif ($c eq '/') {

@@ -87,31 +87,50 @@ sub get_type {
   return ${$self->{entries}}[$idx]->type;
 }
 
+sub get_property {
+  my $entry = shift;
+  my $field = shift;
+  if ($field eq 'entry_type') {
+    return $entry->type;
+  } elsif ($field eq 'key') {
+    return $entry->key;
+  } else {
+    return $entry->get($field);
+  }
+}
+
 sub get_properties {
   my $entry = shift;
 
+  my @my_fields = ("entry_type", "key", @{$fields->{$entry->type}});
   my %properties = ();
-  $properties{entry_type} = $entry->type;
-  $properties{key} = $entry->key;
-  for my $field (@{$fields->{$entry->type}}) {
-    $properties{$field} = $entry->get($field);
+  for my $field (@my_fields) {
+    $properties{$field} = get_property($entry, $field);
   }
   return \%properties;
+}
+
+sub set_property {
+  my $entry = shift;
+  my $field = shift;
+  my $value = shift;
+  if ($field eq 'entry_type') {
+    $entry->set_type($value);
+  } elsif ($field eq 'key') {
+    $entry->set_key($value);
+  } else {
+    return $entry->set($field, $value);
+  }
 }
 
 sub set_properties {
   my $entry = shift;
   my $properties_ref = shift;
   my %properties = %$properties_ref;
-  if (defined($properties{entry_type})) {
-    $entry->set_type($properties{entry_type});
-  }
-  if (defined($properties{key})) {
-    $entry->set_key($properties{key});
-  }
-  for my $field (@{$fields->{$entry->type}}) {
+  my @my_fields = ("entry_type", "key", @{$fields->{$entry->type}});
+  for my $field (@my_fields) {
     if (defined($properties{$field}) && ($properties{$field})) {
-      $entry->set($field, $properties{$field});
+      set_property($entry, $field, $properties{$field});
     }
   }
 }

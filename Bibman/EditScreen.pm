@@ -68,14 +68,7 @@ sub change_type {
   my $self = shift;
   my $new_type = shift;
   my @fields = ("entry_type", "key", @{$Bibliography::fields->{$new_type}});
-#   my %new_properties = ();
-#   for my $key (@fields) {
-#     if (defined($self->{properties}->{$key})) {
-#       $new_properties{$key} = $self->{properties}->{$key};
-#     }
-#   }
   $self->{fields} = \@fields;
-#   $self->{properties} = \%new_properties;
   $self->{properties}->{entry_type} = $new_type;
   $self->{entry}->set_type($new_type);
   $self->reset_inputs;
