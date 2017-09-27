@@ -121,6 +121,17 @@ sub save_bibliography {
   $self->{status}->set("Saved $num_entries entries.");
 }
 
+sub filter {
+  my $self = shift;
+  my ($pattern, $field);
+  if ($#_ > 0) {
+    $field = shift;
+    $pattern = shift;
+  } else {
+    $pattern = shift;
+  }
+}
+
 sub execute_cmd {
   my $self = shift;
   my $cmdline = shift;

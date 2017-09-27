@@ -13,7 +13,7 @@ sub new {
     col_widths => undef,
     highlight => 0,
     top => 0,
-    items => []
+    items => [],
   };
   bless $self, $class;
   $self->reset_col_widths;
@@ -72,7 +72,7 @@ sub update_col_widths {
   }
 }
 
-sub format_line {
+sub format_item {
   my $self = shift;
   my $line = shift;
   my @formatted_line = ();
@@ -179,6 +179,13 @@ sub search_next {
 sub search_prev {
 }
 
+sub filter {
+  my $self = shift;
+  my $visible_items =  shift;
+  $self->{visible_items} = $visible_items;
+  $self->redraw;
+}
+
 sub draw {
   my $self = shift;
   $self->{win} = shift;
@@ -195,16 +202,18 @@ sub redraw {
 
   $self->correct_highlight;
   $self->correct_top;
+  my $cur_y = 0;
   my $max_idx = min($#{$self->{items}}, $self->{top} + $self->{height});
-  for (my $i = $self->{top}; $i <= $max_idx; $i++) {
+  for (my $i = $self->{top}; $i <= $#{$self->{items}; $i++) {
+    next if (!(${$self->{items}}[$i]->{visible}));
     if ($self->{highlight} == $i) {
       $win->attron(A_REVERSE);
     }
-    $win->addstring($self->{y}+$i-$self->{top}, 0,
-                    $self->format_line(${$self->{items}}[$i]));
+    $win->addstring($cur_y, 0, $self->format_item(${$self->{items}}[$i]));
     if ($self->{highlight} == $i) {
       $win->attroff(A_REVERSE);
     }
+    $cur_y++;
   }
 }
 
