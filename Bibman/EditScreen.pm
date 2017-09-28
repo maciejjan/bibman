@@ -39,6 +39,7 @@ sub reset_inputs {
       $value = "";
     }
     $self->{inputs}->{$field} = new TextInput($value);
+    $self->{inputs}->{$field}->set_pos(0);
   }
 }
 
@@ -58,7 +59,9 @@ sub draw {
     if ($i == $self->{highlight}) {
       $self->{win}->attroff(A_REVERSE);
     }
-    $self->{inputs}->{$field}->draw($self->{win}, $self->{left_col_width}+1, $i, 20);
+    my $text_field_size = $maxx - 2 - $self->{left_col_width};
+    $self->{inputs}->{$field}->draw($self->{win}, $self->{left_col_width}+1, 
+                                    $i, $text_field_size);
   }
   $self->{status}->draw($self->{win}, $maxy-1);
 }
@@ -103,50 +106,54 @@ sub show {
 
   while (1) {
     my ($c, $key) = $win->getchar();
-    my $focus = $self->{focus};
-    if (defined($focus)) {
-      if (defined($c) && ($c eq "\n")) {
-        if ($focus eq "entry_type") {
-          my $new_type = $self->{inputs}->{$focus}->{value};
-          if (defined($Bibliography::fields->{$new_type})) {
-            $self->change_type($new_type);
-            $self->draw;
-          } else {
-            $self->{status}->set("Unknown type: $new_type");
-            $self->{inputs}->{$focus}->set_value($self->{properties}->{entry_type});
-          }
-        } else {
-          $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
-        }
-        $self->{focus} = undef;
-        curs_set(0);
-      } elsif (defined($key) && ($key eq KEY_RESIZE)) {
+
+    if (defined($key) && ($key == KEY_RESIZE)) {
         $self->draw;
-      } elsif (defined($key) && ($key eq KEY_EXIT)) {
-        $self->{focus} = undef;
-        curs_set(0);
-      } else {
-        $self->{inputs}->{$self->{focus}}->key_pressed($c, $key);
-      }
     } else {
-      if (defined($c)) {
-        if ($c eq 'k') {
-          $self->go_up;
-        } elsif ($c eq 'j') {
-          $self->go_down;
-        } elsif ($c eq "\n") {
-          $self->{focus} = ${$self->{fields}}[$self->{highlight}];
-          curs_set(1);
-          $self->{inputs}->{$self->{focus}}->redraw;
-        } elsif ($c eq 'q') {
-          Bibliography::set_properties($self->{entry}, $self->{properties});
-          return;
+      my $focus = $self->{focus};
+      if (defined($focus)) {
+        if (defined($c) && ($c eq "\n")) {
+          if ($focus eq "entry_type") {
+            my $new_type = $self->{inputs}->{$focus}->{value};
+            if (defined($Bibliography::fields->{$new_type})) {
+              $self->change_type($new_type);
+              $self->draw;
+            } else {
+              $self->{status}->set("Unknown type: $new_type");
+              $self->{inputs}->{$focus}->set_value($self->{properties}->{entry_type});
+            }
+          } else {
+            $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
+          }
+          $self->{focus} = undef;
+          curs_set(0);
+        } elsif (defined($key) && ($key eq KEY_EXIT)) {
+          $self->{focus} = undef;
+          curs_set(0);
+        } else {
+          $self->{inputs}->{$self->{focus}}->key_pressed($c, $key);
         }
-      } elsif (defined($key)) {
-        if ($key == KEY_UP) {
-          $self->go_up;
-        } elsif ($key == KEY_DOWN) {
-          $self->go_down;
+      } else {
+        if (defined($c)) {
+          if ($c eq 'k') {
+            $self->go_up;
+          } elsif ($c eq 'j') {
+            $self->go_down;
+          } elsif ($c eq "\n") {
+            $self->{focus} = ${$self->{fields}}[$self->{highlight}];
+            $self->{inputs}->{$self->{focus}}->go_to_last;
+            curs_set(1);
+            $self->{inputs}->{$self->{focus}}->redraw;
+          } elsif ($c eq 'q') {
+            Bibliography::set_properties($self->{entry}, $self->{properties});
+            return;
+          }
+        } elsif (defined($key)) {
+          if ($key == KEY_UP) {
+            $self->go_up;
+          } elsif ($key == KEY_DOWN) {
+            $self->go_down;
+          }
         }
       }
     }

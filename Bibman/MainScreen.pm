@@ -270,6 +270,7 @@ sub enter_command_mode {
   }
   $self->{mode} = "command";
   $self->{cmd_prompt}->{value} = $cmd;
+  $self->{cmd_prompt}->{pos} = length $cmd;
   curs_set(1);
   $self->draw;
 }

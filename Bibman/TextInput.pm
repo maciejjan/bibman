@@ -4,12 +4,14 @@ use strict;
 use warnings;
 use feature 'unicode_strings';
 use Curses;
+use List::Util qw( min max );
 
 sub new {
   my $class = shift;
   my $value = shift;
   my $self = {
     value => $value,
+    pos => 0
   };
   bless $self, $class;
 }
@@ -20,7 +22,7 @@ sub draw {
   $self->{x} = shift;
   $self->{y} = shift;
   $self->{size} = shift;
-  $self->{pos} = length $self->{value};
+  $self->{left} = 0;
   $self->redraw;
 }
 
@@ -28,15 +30,46 @@ sub redraw {
   my $self = shift;
   $self->{win}->move($self->{y}, $self->{x});
   $self->{win}->clrtoeol;
-  $self->{win}->addstring($self->{value});
-  $self->{win}->move($self->{y}, $self->{x} + $self->{pos});
+  $self->correct_left;
+  my $length = min($self->{size}, length( $self->{value})-$self->{left});
+  my $str = substr($self->{value}, $self->{left}, $length);
+  $self->{win}->addstring($str);
+  $self->{win}->move($self->{y}, $self->{x} + $self->{pos} - $self->{left});
 }
 
 sub set_value {
   my $self = shift;
   my $value = shift;
   $self->{value} = $value;
-  $self->{pos} = length $value;
+  $self->redraw;
+}
+
+sub correct_left {
+  my $self = shift;
+  my $length = length $self->{value};
+  # if cursor too far on the right -> shift right
+  if ($self->{left} + $self->{size} < $self->{pos}) {
+    $self->{left} = $self->{pos} - $self->{size};
+  }
+  # else if cursor too far on the left -> shift left
+  elsif ($self->{left} > $self->{pos}) {
+    $self->{left} = $self->{pos};
+  }
+  if ($self->{left} + $self->{size} > $length) {
+    $self->{left} = max(0, $length-$self->{size});
+  }
+}
+
+sub set_pos {
+  my $self = shift;
+  my $pos = shift;
+  $self->{pos} = $pos;
+  $self->correct_left;
+}
+
+sub go_to_last {
+  my $self = shift;
+  $self->{pos} = length $self->{value};
   $self->redraw;
 }
 
