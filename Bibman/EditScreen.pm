@@ -23,8 +23,7 @@ sub new {
     highlight => 0
   };
   $self->{properties} = Bibliography::get_properties($self->{entry});
-  my @fields = ("entry_type", "key", @{$Bibliography::fields->{$self->{entry}->type}});
-  $self->{fields} = \@fields;
+  $self->{fields} = Bibliography::get_entry_fields($self->{entry});
   reset_inputs($self);
   bless $self, $class;
 }

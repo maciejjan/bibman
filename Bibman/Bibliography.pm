@@ -5,7 +5,7 @@ use warnings;
 use feature 'unicode_strings';
 use Text::BibTeX;
 
-our $fields = {
+my $fields = {
   article => ["author", "journal", "month", "note", "number", "pages", "title", "volume", "year"],
   book => ["address", "author", "edition", "editor", "month", "note", "number", "publisher", "series", "title", "volume", "year"],
   booklet => ["address", "author", "howpublished", "month", "note", "title", "year"],
@@ -87,6 +87,15 @@ sub get_type {
   return ${$self->{entries}}[$idx]->type;
 }
 
+sub get_entry_fields {
+  my $entry = shift;
+  my @result = ("entry_type", "key");
+  if (defined($entry->type) && (defined($fields->{$entry->type}))) {
+    @result = (@result, @{$fields->{$entry->type}});
+  }
+  return \@result;
+}
+
 sub get_property {
   my $entry = shift;
   my $field = shift;
@@ -102,9 +111,8 @@ sub get_property {
 sub get_properties {
   my $entry = shift;
 
-  my @my_fields = ("entry_type", "key", @{$fields->{$entry->type}});
   my %properties = ();
-  for my $field (@my_fields) {
+  for my $field (@{get_entry_fields($entry)}) {
     $properties{$field} = get_property($entry, $field);
   }
   return \%properties;
@@ -127,8 +135,7 @@ sub set_properties {
   my $entry = shift;
   my $properties_ref = shift;
   my %properties = %$properties_ref;
-  my @my_fields = ("entry_type", "key", @{$fields->{$entry->type}});
-  for my $field (@my_fields) {
+  for my $field (@{get_entry_fields($entry)}) {
     if (defined($properties{$field}) && ($properties{$field})) {
       set_property($entry, $field, $properties{$field});
     }

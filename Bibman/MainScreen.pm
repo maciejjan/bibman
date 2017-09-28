@@ -122,12 +122,6 @@ sub search {
   $self->search_next;
 }
 
-# sub backward_search {
-#   my $self = shift;
-#   $self->set_search_args(@_);
-#   $self->search_prev;
-# }
-
 sub search_next {
   my $self = shift;
   my $idx = $self->{list}->{highlight};
