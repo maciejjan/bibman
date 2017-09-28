@@ -8,8 +8,10 @@ use lib "$Bin/.";
 use Bibman::MainScreen;
 use Bibman::StatusBar;
 
-# TODO proper handling of command-line parameters
 my $INPUT_FILE = shift @ARGV;
+if (!defined($INPUT_FILE)) {
+  die "No input file specified!";
+}
 
 $win = new Curses;
 initscr;

@@ -203,7 +203,6 @@ sub filter_entries {
   $self->draw;
 }
 
-
 sub open_bibliography {
   my $self = shift;
   my $filename = shift;

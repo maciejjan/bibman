@@ -1,6 +1,6 @@
 TODO
 
-v. 0.1:
+v. 0.1 alpha:
 - proper vertical scrolling on the edit screen
 - moving entries around (+ for up, - for down)
 - proper handling of command-line parameters
@@ -9,10 +9,9 @@ v. 0.1:
 - help screen
 - readme
 - more status messages (e.g. errors)
-- proper highlighting of the status bar
 - fields for all entry types
 
-v. 0.2:
+v. 0.2 alpha:
 - sorting entries (by one of the columns)
 - undo option
   - a queue of operations: "add", "edit", "delete" with previous states of the entries
