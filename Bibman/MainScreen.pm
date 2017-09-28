@@ -49,13 +49,14 @@ sub draw {
 
 sub add_entry {
   my $self = shift;
+  my $highlight = $self->{list}->{highlight};
 
-  my $entry = $self->{bibliography}->add_entry("article");
+  my $entry = $self->{bibliography}->add_entry_at($highlight, "article");
   my $edit = new EditScreen($entry);
   $edit->show($self->{win});
-  $self->{list}->add_item(format_entry($entry));
+  $self->{list}->add_item_at($highlight, format_entry($entry));
   $self->draw;
-  $self->{list}->go_to_last;
+  $self->{list}->go_down;
 }
 
 sub edit_entry {

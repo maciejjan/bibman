@@ -31,6 +31,18 @@ sub add_item {
   push @{$self->{items}}, $item;
 }
 
+sub add_item_at {
+  my $self = shift;
+  my $idx = shift;
+  my $values = shift;
+  my $item = {
+    values => $values,
+    visible => 1
+  };
+  $self->update_col_widths($values);
+  splice @{$self->{items}}, $idx+1, 0, $item;
+}
+
 sub update_item {
   my $self = shift;
   my $idx = shift;

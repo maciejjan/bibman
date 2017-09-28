@@ -1,17 +1,28 @@
 TODO
 
-- optional and required fields
-- do not allow duplicate keys?
-- proper scrolling (vertical and horizontal) on the edit screen
-- proper length setting for TextInputs (depending on the window width)
+v. 0.1:
+- proper vertical scrolling on the edit screen
+- moving entries around (+ for up, - for down)
+- proper handling of command-line parameters
+- opening bibliography files from MainScreen
+- man page
+- help screen
+- readme
+- more status messages (e.g. errors)
+- proper highlighting of the status bar
+- fields for all entry types
+
+v. 0.2:
 - sorting entries (by one of the columns)
 - undo option
   - a queue of operations: "add", "edit", "delete" with previous states of the entries
     ("add": undef, "edit"/"delete": previous properties)
-- more status messages (e.g. errors)
 - autocompletion of commands and file names
   - (in TextInput)
   - also values (words in titles, author names etc.)
+
+- optional and required fields
+- do not allow duplicate keys?
 - selecting entries
 - group operations, e.g. editing only common fields
 - keybinding tree

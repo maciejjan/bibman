@@ -65,13 +65,22 @@ sub write {
 sub add_entry {
   my $self = shift;
   my $type = shift;
-#   my $key = shift;
 
   my $entry = Text::BibTeX::Entry->new();
   $entry->set_metatype(Text::BibTeX::BTE_REGULAR);
   $entry->set_type($type);
-#   $entry->set_key($key);
   push @{$self->{entries}}, $entry;
+  return $entry;
+}
+
+sub add_entry_at {
+  my $self = shift;
+  my $idx = shift;
+  my $type = shift;
+  my $entry = Text::BibTeX::Entry->new();
+  $entry->set_metatype(Text::BibTeX::BTE_REGULAR);
+  $entry->set_type($type);
+  splice @{$self->{entries}}, $idx+1, 0, $entry;
   return $entry;
 }
 
