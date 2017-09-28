@@ -5,12 +5,6 @@ TODO
 - proper scrolling (vertical and horizontal) on the edit screen
 - proper length setting for TextInputs (depending on the window width)
 - sorting entries (by one of the columns)
-- "search" functionality: outside the menu class!
-  - search and limit on specific fields
-    e.g. :search author Janicki
-- "filter" functionality
-  - ListItem objects with "visible" flag
-  - also possible: "selected" flag
 - undo option
   - a queue of operations: "add", "edit", "delete" with previous states of the entries
     ("add": undef, "edit"/"delete": previous properties)
@@ -18,6 +12,8 @@ TODO
 - autocompletion of commands and file names
   - (in TextInput)
   - also values (words in titles, author names etc.)
+- selecting entries
+- group operations, e.g. editing only common fields
 - keybinding tree
   - binding: key -> command -> function
   - but first: only binding of single keys without rebinding

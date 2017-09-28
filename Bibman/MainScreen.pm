@@ -20,6 +20,7 @@ sub new {
     status => new StatusBar(),
     cmd_prompt => new TextInput(""),
     mode   => "normal",               # "normal" or "command"
+    filename => undef,
     search_field => undef,
     search_pattern => undef,
     filter_field => undef,
@@ -224,9 +225,12 @@ sub save_bibliography {
   my $self = shift;
   my $filename = shift;
 
-  $self->{bibliography}->write($filename);
+  if (defined($filename)) {
+    $self->{filename} = $filename;
+  }
+  $self->{bibliography}->write($self->{filename});
   my $num_entries = $#{$self->{bibliography}->{entries}}+1;
-  $self->{status}->set("Saved $num_entries entries.");
+  $self->{status}->set("Saved $num_entries entries to $self->{filename}.");
 }
 
 sub execute_cmd {
@@ -253,7 +257,7 @@ sub execute_cmd {
   else {
     $self->{status}->set("Unknown command: $cmd");
   }
-  $self->{status}->set("top $self->{list}->{top}, highlight: $self->{list}->{highlight}");
+#   $self->{status}->set("top $self->{list}->{top}, highlight: $self->{list}->{highlight}");
 }
 
 sub enter_command_mode {
@@ -307,6 +311,8 @@ sub show {
           } elsif ($c eq 'a') {
             $self->execute_cmd('add');
           } elsif ($c eq 's') {
+            $self->execute_cmd('save');
+          } elsif ($c eq 'S') {
             $self->enter_command_mode("save");
           } elsif ($c eq 'd') {
             $self->execute_cmd('delete');
