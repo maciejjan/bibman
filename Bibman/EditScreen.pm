@@ -9,6 +9,7 @@ use List::Util qw( min max );
 use FindBin qw($Bin);
 use lib "$Bin/.";
 use Bibman::Bibliography;
+use Bibman::StatusBar;
 use Bibman::TextInput;
 
 sub new {
@@ -23,7 +24,7 @@ sub new {
     highlight => 0
   };
   $self->{properties} = Bibliography::get_properties($self->{entry});
-  $self->{fields} = Bibliography::get_entry_fields($self->{entry});
+  $self->{fields} = Bibliography::get_fields_for_type($self->{entry}->type);
   reset_inputs($self);
   bless $self, $class;
 }
@@ -39,7 +40,6 @@ sub reset_inputs {
       $value = "";
     }
     $self->{inputs}->{$field} = new TextInput($value);
-    $self->{inputs}->{$field}->set_pos(0);
   }
 }
 
@@ -69,8 +69,7 @@ sub draw {
 sub change_type {
   my $self = shift;
   my $new_type = shift;
-  my @fields = ("entry_type", "key", @{$Bibliography::fields->{$new_type}});
-  $self->{fields} = \@fields;
+  $self->{fields} = Bibliography::get_fields_for_type($new_type);
   $self->{properties}->{entry_type} = $new_type;
   $self->{entry}->set_type($new_type);
   $self->reset_inputs;
@@ -115,16 +114,17 @@ sub show {
         if (defined($c) && ($c eq "\n")) {
           if ($focus eq "entry_type") {
             my $new_type = $self->{inputs}->{$focus}->{value};
-            if (defined($Bibliography::fields->{$new_type})) {
+            if (Bibliography::has_type($new_type)) {
               $self->change_type($new_type);
               $self->draw;
             } else {
-              $self->{status}->set("Unknown type: $new_type");
+              $self->{status}->set("Unknown type: $new_type", StatusBar::ERROR);
               $self->{inputs}->{$focus}->set_value($self->{properties}->{entry_type});
             }
           } else {
             $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
           }
+          $self->{inputs}->{$focus}->go_to_first;
           $self->{focus} = undef;
           curs_set(0);
         } elsif (defined($key) && ($key eq KEY_EXIT)) {

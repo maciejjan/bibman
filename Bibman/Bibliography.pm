@@ -87,11 +87,16 @@ sub get_type {
   return ${$self->{entries}}[$idx]->type;
 }
 
-sub get_entry_fields {
-  my $entry = shift;
+sub has_type {
+  my $type = shift;
+  return defined($fields->{$type});
+}
+
+sub get_fields_for_type {
+  my $type = shift;
   my @result = ("entry_type", "key");
-  if (defined($entry->type) && (defined($fields->{$entry->type}))) {
-    @result = (@result, @{$fields->{$entry->type}});
+  if (defined($type) && (defined($fields->{$type}))) {
+    @result = (@result, @{$fields->{$type}});
   }
   return \@result;
 }
@@ -112,7 +117,7 @@ sub get_properties {
   my $entry = shift;
 
   my %properties = ();
-  for my $field (@{get_entry_fields($entry)}) {
+  for my $field (@{get_fields_for_type($entry->type)}) {
     $properties{$field} = get_property($entry, $field);
   }
   return \%properties;
@@ -135,7 +140,7 @@ sub set_properties {
   my $entry = shift;
   my $properties_ref = shift;
   my %properties = %$properties_ref;
-  for my $field (@{get_entry_fields($entry)}) {
+  for my $field (@{get_fields_for_type($entry->type)}) {
     if (defined($properties{$field}) && ($properties{$field})) {
       set_property($entry, $field, $properties{$field});
     }

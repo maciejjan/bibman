@@ -11,7 +11,8 @@ sub new {
   my $value = shift;
   my $self = {
     value => $value,
-    pos => 0
+    pos => 0,
+    left => 0
   };
   bless $self, $class;
 }
@@ -22,7 +23,6 @@ sub draw {
   $self->{x} = shift;
   $self->{y} = shift;
   $self->{size} = shift;
-  $self->{left} = 0;
   $self->redraw;
 }
 
@@ -60,11 +60,10 @@ sub correct_left {
   }
 }
 
-sub set_pos {
+sub go_to_first {
   my $self = shift;
-  my $pos = shift;
-  $self->{pos} = $pos;
-  $self->correct_left;
+  $self->{pos} = 0;
+  $self->redraw;
 }
 
 sub go_to_last {

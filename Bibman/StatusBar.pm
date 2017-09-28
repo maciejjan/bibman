@@ -1,11 +1,18 @@
 package StatusBar;
 
 use feature 'unicode_strings';
+use Curses;
+
+use constant {
+  INFO => 1,
+  ERROR => 2
+};
 
 sub new {
   my $class = shift;
   my $self = {
-    status => ""
+    status => "",
+    type => INFO
   };
   bless $self, $class;
 }
@@ -24,9 +31,9 @@ sub redraw {
   if (!defined($self->{win})) {
     return;
   }
-  $self->{win}->attron(A_BOLD);
+  $self->{win}->attron(COLOR_PAIR($self->{type}) | A_BOLD);
   $self->{win}->addstring($self->{position}, 0, $self->{status});
-  $self->{win}->attroff(A_BOLD);
+  $self->{win}->attroff(COLOR_PAIR($self->{type}) | A_BOLD);
   $self->{win}->clrtoeol();
 }
 
@@ -34,6 +41,9 @@ sub set {
   my $self = shift;
   my $status = shift;
   my $type = shift;
+  if (!defined($type)) {
+    $type = INFO;
+  }
 
   $self->{status} = $status;
   $self->{type} = $type;

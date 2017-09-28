@@ -255,9 +255,8 @@ sub execute_cmd {
   elsif ($cmd eq 'search-prev')  { $self->search_prev;                     }
   elsif ($cmd eq 'quit')         { $self->quit;                            }
   else {
-    $self->{status}->set("Unknown command: $cmd");
+    $self->{status}->set("Unknown command: $cmd", StatusBar::ERROR);
   }
-#   $self->{status}->set("top $self->{list}->{top}, highlight: $self->{list}->{highlight}");
 }
 
 sub enter_command_mode {
