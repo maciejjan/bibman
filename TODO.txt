@@ -3,8 +3,8 @@ TODO
 v. 0.1 alpha:
 - proper vertical scrolling on the edit screen
 - moving entries around (+ for up, - for down)
-- proper handling of command-line parameters
 - opening bibliography files from MainScreen
+- command-line parameters (at least --help and --version)
 - man page
 - help screen
 - readme
