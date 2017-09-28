@@ -174,8 +174,8 @@ sub redraw {
 
   $self->correct_top;
   my $cur_y = 0;
-  my $idx = $self->{top};
-  while (($cur_y <= $self->{height}) && ($idx <= $#{$self->{items}})) {
+  my $idx = $self->next_visible($self->{top});
+  while (defined($idx) && ($cur_y <= $self->{height}) && ($idx <= $#{$self->{items}})) {
     if ($self->{highlight} == $idx) {
       $win->attron(A_REVERSE);
     }
@@ -185,7 +185,6 @@ sub redraw {
     }
     $cur_y++;
     $idx = $self->next_visible(++$idx);
-    last if (!defined($idx));
   }
 }
 
@@ -194,8 +193,22 @@ sub correct_top {
   my $self = shift;
   my $new_top = $self->{highlight};
   my $num_entries = 0;
+  # set the highlight to at least the old top (or lower if needed)
   while (($num_entries < $self->{height}) && ($new_top > $self->{top})) {
-    my $new_new_top = $self->prev_visible(--$new_top);
+    my $new_new_top = $self->prev_visible($new_top-1);
+    last if (!defined($new_new_top));
+    $new_top = $new_new_top;
+    $num_entries++;
+  }
+  # count the entries below the highlight
+  my $idx = $self->next_visible($self->{highlight});
+  while ((defined($idx)) && ($idx < $#{$self->{items}}) && ($num_entries < $self->{height})) {
+    $idx = $self->next_visible($idx+1);
+    $num_entries++;
+  }
+  # if necessary, lift the top further up
+  while ($num_entries < $self->{height}) {
+    my $new_new_top = $self->prev_visible($new_top-1);
     last if (!defined($new_new_top));
     $new_top = $new_new_top;
     $num_entries++;

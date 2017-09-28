@@ -180,7 +180,7 @@ sub match {
   return 0;
 }
 
-sub filter {
+sub filter_entries {
   my $self = shift;
   my ($field, $pattern) = get_search_args(@_);
   if (!defined($pattern) || (!$pattern)) {
@@ -199,8 +199,12 @@ sub filter {
       }
     }
   }
+  my $idx = $self->{list}->next_visible($self->{list}->{highlight});
+  if (!defined($idx)) {
+    $idx = $self->{list}->prev_visible($self->{list}->{highlight});
+  }
+  $self->{list}->go_to_item($idx);
   $self->draw;
-  $self->{status}->set("blah: " . ${$self->{list}->{items}}[0]->{visible});
 }
 
 
@@ -241,7 +245,7 @@ sub execute_cmd {
   if    ($cmd eq 'add')          { $self->add_entry(@args);                }
   elsif ($cmd eq 'delete')       { $self->delete_entry;                    }
   elsif ($cmd eq 'edit')         { $self->edit_entry;                      }
-  elsif ($cmd eq 'filter')       { $self->filter(@args);                   }
+  elsif ($cmd eq 'filter')       { $self->filter_entries(@args);           }
   elsif ($cmd eq 'go-up')        { $self->{list}->go_up;                   }
   elsif ($cmd eq 'go-to-first')  { $self->{list}->go_to_first;             }
   elsif ($cmd eq 'go-down')      { $self->{list}->go_down;                 }
@@ -255,6 +259,7 @@ sub execute_cmd {
   else {
     $self->{status}->set("Unknown command: $cmd");
   }
+  $self->{status}->set("top $self->{list}->{top}, highlight: $self->{list}->{highlight}");
 }
 
 sub enter_command_mode {
