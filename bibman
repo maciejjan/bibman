@@ -16,7 +16,7 @@ use constant VERSION => "0.1-alpha";
 
 my $INPUT_FILE;
 my $arg = shift @ARGV;
-if (defined($arg)) {
+while (defined($arg)) {
   if (($arg eq "-h") || ($arg eq "--help")) {
     print_help();
   } elsif (($arg eq "-v") || ($arg eq "--version")) {
@@ -27,6 +27,7 @@ if (defined($arg)) {
     $INPUT_FILE = $arg;
     last;
   }
+  $arg = shift @ARGV;
 }
 
 if (!defined($INPUT_FILE)) {
