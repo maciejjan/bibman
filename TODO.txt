@@ -20,6 +20,7 @@ v. 0.2 alpha:
   - (in TextInput)
   - also values (words in titles, author names etc.)
 
+further features:
 - optional and required fields
 - do not allow duplicate keys?
 - selecting entries
@@ -27,25 +28,4 @@ v. 0.2 alpha:
 - keybinding tree
   - binding: key -> command -> function
   - but first: only binding of single keys without rebinding
-
-
-PROJECT
-
-ncurses bibliography manager
-
-main window:
-- table: key, author, title
-- <CR>: opens the file (if present) in an external PDF viewer
-- filtering by title, author etc.
-- adding an entry (type chosen interactively; key required)
-  - e.g. :add InProceedings janicki15
-- ":" enters command mode
-- deleting entry
-- changing field:
-  :change-author Janicki, Maciej
-  :change-year 2007
-- exporting entries
-  bibman bibliography.bib -e janicki15,sumalvico17 > mypaper.bib
-- command-line search
-  bibman bibliography.bib -s title morphology
 
