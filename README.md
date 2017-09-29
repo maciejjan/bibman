@@ -26,7 +26,12 @@ make uninstall
 
 # Getting started
 
-After installation, run the command `bibman MY-BIBLIOGRAPHY-FILE` to open the bibliography file. You will see a list of entries. Here are some basic keybindings:
+After installation, run the command `bibman MY-BIBLIOGRAPHY-FILE` to open the bibliography file. You will see a list of entries like this:
+
+![screenshot](screenshot.png)
+
+
+Here are some basic keybindings:
 
 * **\<up\>**/**k** move one entry up,
 * **\<down\>**/**j** move one entry down,
