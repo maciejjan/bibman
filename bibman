@@ -101,18 +101,99 @@ bibman [options] FILE
 
 =head1 DESCRIPTION
 
-TODO
+Bibman (BIBliography MANager) is a small console tool for managing BibTeX
+files. Its functionality is meant to be similar to JabRef and its user
+interface is inspired by Vim. It enables quick searching, filtering, editing,
+sorting etc. of bibliography entries using a text-mode, keyboard-only
+interface. It stores bibliographies in plain BibTeX files and uses only
+standard fields.
 
-=head1 COMMANDS
+=head1 COMMANDS AND KEYBINDINGS
 
-=head1 KEY BINDINGS
+Bibman can be controlled by typing commands into the command line (like e.g. in
+Vim). The command line is triggered by pressing B<:> (colon). Most commands are
+bound to a single keyboard key. If a command requires additional parameters,
+pressing the key opens the command line, so that parameters can be provided.
+The commands and keybindings are listed below.
+
+=head2 Navigation
+
+ <Up>, k, :go-up          go one entry up
+ <Down>, j, :go-down      to one entry down
+ <Home>, g, :go-to-first  go to first entry
+ <End>, G, :go-to-last    go to last entry
+ <Enter>, :open-entry     open the pdf file associated with the entry
+ q, :quit                 quit bibman (without saving changes)
+
+=head2 Manipulating entries
+
+ a, :add                add new entry
+ e, :edit               edit entry
+ d, :delete             delete entry
+
+=head2 Searching and filtering
+
+ /, :search [PATTERN]          search for PATTERN in the visible columns of the list
+ /, :search [FIELD] [PATTERN]  search for PATTERN in FIELD
+ n, :search-next               jump to the next search result
+ N, :search-prev               jump to the previous search result
+ f, :filter [PATTERN]          show only list items matching PATTERN
+ f, :filter [FIELD] [PATTERN]  show only entries, whose FIELD matches PATTERN
+
+=head2 Input/Output
+
+ o, :open [FILENAME]    open a bibliography file
+ s, :save               save the entry to the current file
+ S, :save [FILENAME]    save the entry to file FILENAME
+
+=head2 Edit screen
+
+ <Up>, k           go one field up
+ <Down>, j         go one field down
+ <Enter>           toggle editing the field
+ q                 save changes and quit the edit screen
+
+
+=head1 SEARCHING AND FILTERING
+
+The commands B<search> and B<filter> can be executed either with a single
+argument PATTERN, like:
+
+ :search Smith
+
+or with two arguments: FIELD and PATTERN, like:
+
+ :search author Smith
+
+The first variant will search for matches in the visible elements of the list
+(e.g. in case of 3 or more authors, only the first author). The second variant
+will search the relevant BibTeX fields (e.g. all authors for the field
+"author"). In both cases, PATTERN is a Perl regular expression. For example,
+the following command will show only entries published between 2010 and 2015:
+
+ :filter year 201[0-5]
+
+In order to clear the filtering and show all entries, execute the "filter"
+command without any arguments.
+ 
 
 =head1 LICENSE
 
-GPLv3 or later
+Bibman is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-=head1 LINKS
+Bibman is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Bibman. If not, see <http://www.gnu.org/licenses/>.
 
 =head1 BUGS
+
+Please report bugs to: <http://github.com/maciejsum/bibman>
 
 =cut
