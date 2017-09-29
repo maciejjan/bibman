@@ -1,6 +1,6 @@
 # About
 
-Bibman (BIBliography MANager) is a small console tool for managing BibTeX files. Its functionality is meant to be similar to JabRef and its user interface is inspired by programs like Vim, Mutt or Ranger. It enables quick searching, filtering, editing, sorting etc. of bibliography entries using a text-mode, keyboard-only interface. Unlike other similar tools, it stores bibliographies in plain BibTeX files and uses only standard fields.
+Bibman (BIBliography MANager) is a small console tool for managing BibTeX files. Its functionality is meant to be similar to JabRef and its user interface is inspired by Vim. It enables quick searching, filtering, editing, sorting etc. of bibliography entries using a text-mode, keyboard-only interface. It stores bibliographies in plain BibTeX files and uses only standard fields.
 
 # Dependencies
 
