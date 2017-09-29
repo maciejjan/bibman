@@ -1,9 +1,5 @@
 TODO
 
-v. 0.1 alpha:
-- proper vertical scrolling on the edit screen
-- fields for all entry types
-
 v. 0.2 alpha:
 - moving entries around (+ for up, - for down)
 - sorting entries (by one of the columns)
