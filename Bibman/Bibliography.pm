@@ -34,7 +34,7 @@ my $fields = {
   misc => ["author", "howpublished", "month", "note", "school", "title", "type", "year"],
   proceedings => ["address", "editor", "month", "note", "number", "organization", "publisher", "series", "title", "volume", "year"],
   techreport => ["address", "author", "institution", "month", "note", "number", "title", "type", "year"],
-  unupublished => ["author", "month", "note", "title", "year"]
+  unpublished => ["author", "month", "note", "title", "year"]
 };
 
 sub new {
