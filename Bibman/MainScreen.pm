@@ -1,3 +1,19 @@
+# This file is part of Bibman -- a console tool for managing BibTeX files.
+# Copyright 2017, Maciej Sumalvico <macjan@o2.pl>
+
+# Bibman is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Bibman is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Bibman. If not, see <http://www.gnu.org/licenses/>.
+
 package MainScreen;
 
 use strict;
@@ -5,8 +21,6 @@ use warnings;
 use feature 'unicode_strings';
 use Curses;
 use File::Basename;
-use FindBin qw($Bin);
-use lib "$Bin/.";
 use Bibman::Bibliography;
 use Bibman::EditScreen;
 use Bibman::TabularList;
@@ -248,6 +262,7 @@ sub execute_cmd {
   elsif ($cmd eq 'go-to-first')  { $self->{list}->go_to_first;             }
   elsif ($cmd eq 'go-down')      { $self->{list}->go_down;                 }
   elsif ($cmd eq 'go-to-last')   { $self->{list}->go_to_last;              }
+  elsif ($cmd eq 'open')         { $self->open_bibliography(@args); $self->draw; }
   elsif ($cmd eq 'open-entry')   { $self->open_entry;                      }
   elsif ($cmd eq 'save')         { $self->save_bibliography(@args);        }
   elsif ($cmd eq 'search')       { $self->search(@args);                   }
@@ -320,6 +335,8 @@ sub show {
             $self->enter_command_mode("filter");
           } elsif ($c eq 'e') {
             $self->execute_cmd('edit');
+          } elsif ($c eq 'o') {
+            $self->enter_command_mode('open');
           } elsif ($c eq '/') {
             $self->enter_command_mode("search");
           } elsif ($c eq "\n") {

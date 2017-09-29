@@ -6,7 +6,7 @@ v. 0.1 alpha:
 - opening bibliography files from MainScreen
 - command-line parameters (at least --help and --version)
 - man page
-- help screen
+- help screen, keybinding cheat-sheets
 - readme
 - more status messages (e.g. errors)
 - fields for all entry types
