@@ -6,7 +6,7 @@ Bibman (BIBliography MANager) is a small console tool for managing BibTeX files.
 
 `perl` >= 5.24\*, `ncurses` >= 6.0\*, `perl-Curses`, `perl-Text-Bibtex`
 
-\*) might work on previous versions, but not tested
+\*) might work on earlier versions, but not tested
 
 # Installation
 
