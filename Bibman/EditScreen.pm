@@ -34,8 +34,11 @@ sub new {
     properties => undef,
     focus => undef,
     inputs => undef,
+    height => undef,
+    left_col_width => undef,
     status => new StatusBar(),
-    highlight => 0
+    highlight => 0,
+    top => 0
   };
   $self->{properties} = Bibliography::get_properties($self->{entry});
   $self->{fields} = Bibliography::get_fields_for_type($self->{entry}->type);
@@ -59,25 +62,44 @@ sub reset_inputs {
 
 sub draw {
   my $self = shift;
-  $self->correct_highlight;
   $self->{win}->erase;
   my ($maxy, $maxx);
   $self->{win}->getmaxyx($maxy, $maxx);
-  for (my $i = 0; $i <= $#{$self->{fields}}; $i++) {
+  $self->{height} = $maxy-2;
+  $self->correct_highlight;
+  $self->correct_top;
+  my $max_idx = min($#{$self->{fields}}, $self->{top} + $self->{height});
+  for (my $i = $self->{top}; $i <= $max_idx; $i++) {
     my $field = ${$self->{fields}}[$i];
     my $spaces = " " x ($self->{left_col_width} - length $field);
     if ($i == $self->{highlight}) {
       $self->{win}->attron(A_REVERSE);
     }
-    $self->{win}->addstring($i, 0, $spaces . $field);
+    $self->{win}->addstring($i-$self->{top}, 0, $spaces . $field);
     if ($i == $self->{highlight}) {
       $self->{win}->attroff(A_REVERSE);
     }
     my $text_field_size = $maxx - 2 - $self->{left_col_width};
     $self->{inputs}->{$field}->draw($self->{win}, $self->{left_col_width}+1, 
-                                    $i, $text_field_size);
+                                    $i-$self->{top}, $text_field_size);
   }
   $self->{status}->draw($self->{win}, $maxy-1);
+}
+
+sub correct_top {
+  my $self = shift;
+  # if the highlight is above the screen -> move up
+  if ($self->{highlight} < $self->{top}) {
+    $self->{top} = $self->{highlight};
+  }
+  # if the highlight is below the screen -> move down
+  elsif ($self->{highlight} > $self->{top} + $self->{height}) {
+    $self->{top} = $self->{highlight}-$self->{height};
+  }
+  # if there is empty space below -> move up
+  if ($self->{highlight} - $self->{top} + $self->{height} > $#{$self->{fields}}) {
+    $self->{top} = max(0, $#{$self->{fields}}-$self->{height});
+  }
 }
 
 sub change_type {
