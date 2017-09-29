@@ -26,15 +26,15 @@ my $fields = {
   book => ["address", "author", "edition", "editor", "month", "note", "number", "publisher", "series", "title", "volume", "year"],
   booklet => ["address", "author", "howpublished", "month", "note", "title", "year"],
   inbook => ["address", "author", "chapter", "edition", "editor", "month", "note", "number", "pages", "publisher", "series", "title", "type", "volume", "year"],
-  incollection => [],
+  incollection => ["address", "author", "booktitle", "chapter", "edition", "editor", "month", "note", "number", "pages", "publisher", "series", "title", "type", "volume", "year"],
   inproceedings => ["address", "author", "booktitle", "chapter", "edition", "editor", "month", "note", "number", "pages", "publisher", "series", "title", "type", "volume", "year"],
-  manual => [],
+  manual => ["address", "author", "edition", "month", "note", "organization", "title", "year"],
   thesis => ["address", "author", "month", "note", "school", "title", "type", "year"],
   phdthesis => ["address", "author", "month", "note", "school", "title", "type", "year"],
-  misc => [],
-  proceedings => [],
-  techreport => [],
-  unupublished => [],
+  misc => ["author", "howpublished", "month", "note", "school", "title", "type", "year"],
+  proceedings => ["address", "editor", "month", "note", "number", "organization", "publisher", "series", "title", "volume", "year"],
+  techreport => ["address", "author", "institution", "month", "note", "number", "title", "type", "year"],
+  unupublished => ["author", "month", "note", "title", "year"]
 };
 
 sub new {

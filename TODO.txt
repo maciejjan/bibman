@@ -2,17 +2,13 @@ TODO
 
 v. 0.1 alpha:
 - proper vertical scrolling on the edit screen
-- moving entries around (+ for up, - for down)
-- opening bibliography files from MainScreen
-- command-line parameters (at least --help and --version)
-- man page
-- help screen, keybinding cheat-sheets
-- readme
-- more status messages (e.g. errors)
 - fields for all entry types
 
 v. 0.2 alpha:
+- moving entries around (+ for up, - for down)
 - sorting entries (by one of the columns)
+- help screen, keybinding cheat-sheets
+- more helpful status messages (e.g. errors)
 - undo option
   - a queue of operations: "add", "edit", "delete" with previous states of the entries
     ("add": undef, "edit"/"delete": previous properties)
@@ -23,9 +19,11 @@ v. 0.2 alpha:
 further features:
 - optional and required fields
 - do not allow duplicate keys?
-- selecting entries
+- selecting multiple entries
 - group operations, e.g. editing only common fields
+- automatic key generation
 - keybinding tree
   - binding: key -> command -> function
   - but first: only binding of single keys without rebinding
+- user-defined keybindings and configuration
 
