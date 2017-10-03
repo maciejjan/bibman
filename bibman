@@ -130,6 +130,8 @@ The commands and keybindings are listed below.
  a, :add                add new entry
  e, :edit               edit entry
  d, :delete             delete entry
+ -, :move-up            move entry up
+ +, :move-down          move entry down
 
 =head2 Searching and filtering
 
