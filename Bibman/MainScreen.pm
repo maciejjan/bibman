@@ -23,9 +23,10 @@ use Curses;
 use File::Basename;
 use Bibman::Bibliography;
 use Bibman::EditScreen;
+use Bibman::StatusBar;
 use Bibman::TabularList;
 use Bibman::TextInput;
-use Bibman::StatusBar;
+use Bibman::TrieAutocompleter;
 
 sub new {
   my $class = shift;
@@ -40,6 +41,9 @@ sub new {
     filter_field => undef,
     filter_pattern => undef
   };
+  $self->{cmd_prompt}->{autocompleter} = new TrieAutocompleter();
+  $self->{cmd_prompt}->{autocompleter}->add("save");
+  $self->{cmd_prompt}->{autocompleter}->add("quit");
   bless $self, $class;
 }
 

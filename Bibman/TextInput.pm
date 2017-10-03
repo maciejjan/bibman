@@ -28,7 +28,8 @@ sub new {
   my $self = {
     value => $value,
     pos => 0,
-    left => 0
+    left => 0,
+    autocomplete => undef
   };
   bless $self, $class;
 }
@@ -88,14 +89,33 @@ sub go_to_last {
   $self->redraw;
 }
 
+sub autocomplete_next {
+  my $self = shift;
+  if (!defined($self->{autocompleter})) { return; }
+  my $idx = rindex($self->{value}, " ", $self->{pos});
+  if ($idx == -1) { $idx = 0; }
+  my $query = substr($self->{value}, $idx, $self->{pos}-$idx);
+  if ($self->{autocompleter}->{query} ne $query) {
+    $self->{autocompleter}->start($query);
+  }
+  my $suggestion = $self->{autocompleter}->next;
+  substr($self->{value}, $idx, $self->{pos}-$idx) = $suggestion;
+  $self->{pos} = $idx + length $suggestion;
+  $self->redraw;
+}
+
 sub key_pressed {
   my $self = shift;
   my $c = shift;
   my $key = shift;
 
   if (defined($c)) {
-    substr($self->{value}, $self->{pos}, 0) = $c;
-    $self->{pos}++;
+    if ($c eq "\t") {
+      $self->autocomplete_next;
+    } else {
+      substr($self->{value}, $self->{pos}, 0) = $c;
+      $self->{pos}++;
+    }
   } elsif (defined($key)) {
     if ($key == KEY_BACKSPACE) {
       if ($self->{pos} > 0) {
