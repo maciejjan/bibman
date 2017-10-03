@@ -1,7 +1,6 @@
 TODO
 
 v. 0.2 alpha:
-- moving entries around (+ for up, - for down)
 - sorting entries (by one of the columns)
 - help screen, keybinding cheat-sheets
 - more helpful status messages (e.g. errors)
@@ -22,4 +21,4 @@ further features:
   - binding: key -> command -> function
   - but first: only binding of single keys without rebinding
 - user-defined keybindings and configuration
-
+- localization

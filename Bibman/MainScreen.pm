@@ -217,6 +217,44 @@ sub filter_entries {
   $self->draw;
 }
 
+sub move_down {
+  my $self = shift;
+  my $idx = $self->{list}->{highlight};
+  my $entries = $self->{bibliography}->{entries};
+  my $list_items = $self->{list}->{items};
+  if ($idx < $#$entries) {
+    # swap the entry at $idx with the one at $idx+1
+    my $entry = $$entries[$idx];
+    $$entries[$idx] = $$entries[$idx+1];
+    $$entries[$idx+1] = $entry;
+    # do the same with the list item
+    my $item = $$list_items[$idx];
+    $$list_items[$idx] = $$list_items[$idx+1];
+    $$list_items[$idx+1] = $item;
+    $self->{list}->go_to_item($idx+1);
+    $self->draw;
+  }
+}
+
+sub move_up {
+  my $self = shift;
+  my $idx = $self->{list}->{highlight};
+  my $entries = $self->{bibliography}->{entries};
+  my $list_items = $self->{list}->{items};
+  if ($idx > 0) {
+    # swap the entry at $idx with the one at $idx+1
+    my $entry = $$entries[$idx];
+    $$entries[$idx] = $$entries[$idx-1];
+    $$entries[$idx-1] = $entry;
+    # do the same with the list item
+    my $item = $$list_items[$idx];
+    $$list_items[$idx] = $$list_items[$idx-1];
+    $$list_items[$idx-1] = $item;
+    $self->{list}->go_to_item($idx-1);
+    $self->draw;
+  }
+}
+
 sub open_bibliography {
   my $self = shift;
   my $filename = shift;
@@ -262,6 +300,8 @@ sub execute_cmd {
   elsif ($cmd eq 'go-to-first')  { $self->{list}->go_to_first;             }
   elsif ($cmd eq 'go-down')      { $self->{list}->go_down;                 }
   elsif ($cmd eq 'go-to-last')   { $self->{list}->go_to_last;              }
+  elsif ($cmd eq 'move-down')    { $self->move_down;                       }
+  elsif ($cmd eq 'move-up')      { $self->move_up;                         }
   elsif ($cmd eq 'open')         { $self->open_bibliography(@args); $self->draw; }
   elsif ($cmd eq 'open-entry')   { $self->open_entry;                      }
   elsif ($cmd eq 'save')         { $self->save_bibliography(@args);        }
@@ -319,6 +359,10 @@ sub show {
             $self->execute_cmd('go-to-first');
           } elsif ($c eq 'G') {
             $self->execute_cmd('go-to-last');
+          } elsif ($c eq "-") {
+            $self->execute_cmd('move-up');
+          } elsif ($c eq "+") {
+            $self->execute_cmd('move-down');
           } elsif ($c eq 'n') {
             $self->execute_cmd('search-next');
           } elsif ($c eq 'N') {
