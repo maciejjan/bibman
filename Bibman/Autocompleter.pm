@@ -31,6 +31,13 @@ sub new {
   bless $self, $class;
 }
 
+sub reset {
+  my $self = shift;
+  undef $self->{query};
+  undef $self->{suggestions};
+  undef $self->{idx};
+}
+
 sub next {
   my $self = shift;
   $self->{idx}++;

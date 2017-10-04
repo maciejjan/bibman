@@ -42,6 +42,8 @@ sub new {
     filter_pattern => undef
   };
   $self->{cmd_prompt}->{autocompleter} = new TrieAutocompleter();
+  $self->{cmd_prompt}->{autocompleter}->add("add");
+  $self->{cmd_prompt}->{autocompleter}->add("edit");
   $self->{cmd_prompt}->{autocompleter}->add("save");
   $self->{cmd_prompt}->{autocompleter}->add("quit");
   bless $self, $class;
@@ -63,6 +65,8 @@ sub draw {
     $self->{win}->addstring($maxy-1, 0, ":");
     $self->{cmd_prompt}->draw($self->{win}, 1, $maxy-1, $maxx-2);
   }
+#   my @suggestions = @{$self->{cmd_prompt}->{autocompleter}->{trie}->lookup("")};
+#   $self->{status}->set(join(" ", @suggestions));
 }
 
 sub add_entry {

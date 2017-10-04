@@ -19,29 +19,23 @@ package TrieAutocompleter;
 use strict;
 use warnings;
 use feature 'unicode_strings';
-use Tree::Trie;
+use Bibman::Trie;
 use Bibman::Autocompleter;
 
-@ISA = (Autocompleter);
+our @ISA = ("Autocompleter");
 
 
 sub new {
   my $class = shift;
-#   my $self = {
-#     trie => new Tree:Trie,
-#     query => undef,
-#     suggestions => undef,
-#     idx => undef
-#   };
   my $self = Autocompleter::new(@_);
-  $self->{trie} = new Tree:Trie;
+  $self->{trie} = new Trie;
   bless $self, $class;
 }
 
 sub add {
   my $self = shift;
   my $value = shift;
-  $self->{trie}->add($value);
+  $self->{trie}->insert($value);
 }
 
 sub start {
