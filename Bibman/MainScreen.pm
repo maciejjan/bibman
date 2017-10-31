@@ -22,6 +22,7 @@ use feature 'unicode_strings';
 use Curses;
 use File::Basename;
 use Bibman::Bibliography;
+use Bibman::Commands;
 use Bibman::CommandManager;
 use Bibman::EditScreen;
 use Bibman::StatusBar;

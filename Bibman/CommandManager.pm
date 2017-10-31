@@ -44,9 +44,9 @@ use feature 'unicode_strings';
 
 sub new {
   my $class = shift;
-  $self = {
+  my $self = {
     commands => {}
-  }
+  };
   bless $self, $class;
 }
 
@@ -72,9 +72,11 @@ sub register {
 
 sub instance {
   my $self = shift;
-  my $cmd_data = shift;
+  my $cmdline = shift;
 
-  if (!defined($self->{commands}->{$cmd_data->{name}})) {
+  @args = split(/\s+/, $cmdline);
+
+  if (!defined($self->{commands}->{$args[0]})) {
     # TODO exception
   }
   return $class->new(@$args);
