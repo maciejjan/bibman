@@ -25,17 +25,59 @@ use feature 'unicode_strings';
 # - command properties:
 #   - name
 #   - arguments (type: file / oneof / string)
+#   - command class
 # - register
 # - autocomplete (in a separate class!)
 #   - "complete" function reference as a field of TextInput
 #     - input: string (the current value) -- or only the last token?!
 #     - output: a list of strings (value proposals)
 #     - TextInput implements cycling through completion proposals
-# - execute
+# - each command implements the following methods:
+#   - execute
+#   - undo
 #
 # usage example:
 # cmdmgr = new CommandManager;
 # cmdmgr.register({name => 'quit', args => []});
-# cmdmgr.register({name => '')
+# cmdmgr.register({name => '');
+# cmdmgr.instance({name => 'save', args => ['bibliography.bib']});
+
+sub new {
+  my $class = shift;
+  $self = {
+    commands => {}
+  }
+  bless $self, $class;
+}
+
+sub register {
+  my $self = shift;
+  my $cmd_data = shift;
+
+  if (!defined($cmd_data->{name})) {
+    # TODO exception
+  }
+  if (!defined($cmd_data->{args})) {
+    # TODO exception
+  }
+  if (!defined($cmd_data->{class})) {
+    # TODO exception
+  }
+
+  if (!defined($self->{commands}->{$cmd_data->{name}})) {
+    $self->{commands}->{$cmd_data->{name}} = [];
+  }
+  push @{$self->{commands}->{$cmd_data->{name}}}, $cmd_data;
+}
+
+sub instance {
+  my $self = shift;
+  my $cmd_data = shift;
+
+  if (!defined($self->{commands}->{$cmd_data->{name}})) {
+    # TODO exception
+  }
+  return $class->new(@$args);
+}
 
 1;

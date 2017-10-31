@@ -22,6 +22,7 @@ use feature 'unicode_strings';
 use Curses;
 use File::Basename;
 use Bibman::Bibliography;
+use Bibman::CommandManager;
 use Bibman::EditScreen;
 use Bibman::StatusBar;
 use Bibman::TabularList;
@@ -34,6 +35,7 @@ sub new {
     list   => new TabularList(4),
     status => new StatusBar(),
     cmd_prompt => new TextInput(""),
+    cmdmgr => new CommandManager(),
     mode   => "normal",               # "normal" or "command"
     filename => undef,
     search_field => undef,
@@ -46,6 +48,31 @@ sub new {
   $self->{cmd_prompt}->{autocompleter}->add("edit");
   $self->{cmd_prompt}->{autocompleter}->add("save");
   $self->{cmd_prompt}->{autocompleter}->add("quit");
+  
+  $self->{cmdmgr}->register(name => "quit", args => [], class => CmdQuit);
+
+#   $self->{cmdmgr}->register({
+#     name => "quit",
+#     args => [],
+#     exec => sub {
+#       endwin;
+#       exit 0;
+#     }});
+#   $self->{cmdmgr}->register({
+#     name => "add",
+#     args => [],
+#     get_context => sub {
+#       # TODO collect the information from the main screen relevant for 
+#       #      executing the method
+#     },
+#     exec => sub {
+#       endwin;
+#       exit 0;
+#     },
+#     undo => sub {
+#     }
+#   });
+
   bless $self, $class;
 }
 
@@ -418,7 +445,8 @@ sub show {
           $self->exit_command_mode;
         } elsif (defined($c) && ($c eq "\n")) {
           $self->exit_command_mode;
-          $self->execute_cmd($self->{cmd_prompt}->{value});
+          my $cmd = $self->{cmdmgr}->instance($self->{cmd_prompt}->{value});
+#           $self->execute_cmd($self->{cmd_prompt}->{value});
         } else {
           $self->{cmd_prompt}->key_pressed($c, $key);
         }
