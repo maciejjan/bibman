@@ -70,7 +70,8 @@ sub register {
   push @{$self->{commands}->{$cmd_data->{name}}}, $cmd_data;
 }
 
-sub instance {
+# parses a command line and returns a relevant Command object
+sub call {
   my $self = shift;
   my $cmdline = shift;
 
@@ -79,7 +80,18 @@ sub instance {
   if (!defined($self->{commands}->{$args[0]})) {
     # TODO exception
   }
+  die "Not implemented!";
+  # TODO find the right Command object for this call
   return $class->new(@$args);
+}
+
+#
+sub autocomplete {
+  my $self = shift;
+  my $cmdline = shift;  # the current command line
+  my $pos = shift;      # cursor position
+  # TODO
+  die "Not implemented!";
 }
 
 1;
