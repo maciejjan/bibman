@@ -22,7 +22,7 @@ use feature 'unicode_strings';
 use Curses;
 use File::Basename;
 use Bibman::Bibliography;
-use Bibman::Commands::CmdQuit;
+# use Bibman::Commands::CmdQuit;
 use Bibman::CommandManager;
 use Bibman::EditScreen;
 use Bibman::StatusBar;
@@ -50,29 +50,7 @@ sub new {
   $self->{cmd_prompt}->{autocompleter}->add("save");
   $self->{cmd_prompt}->{autocompleter}->add("quit");
   
-  $self->{cmdmgr}->register({name => "quit", args => [], class => \&CmdQuit::new});
-
-#   $self->{cmdmgr}->register({
-#     name => "quit",
-#     args => [],
-#     exec => sub {
-#       endwin;
-#       exit 0;
-#     }});
-#   $self->{cmdmgr}->register({
-#     name => "add",
-#     args => [],
-#     get_context => sub {
-#       # TODO collect the information from the main screen relevant for 
-#       #      executing the method
-#     },
-#     exec => sub {
-#       endwin;
-#       exit 0;
-#     },
-#     undo => sub {
-#     }
-#   });
+  $self->{cmdmgr}->register({name => "quit", args => [], class => 'CmdQuit'});
 
   bless $self, $class;
 }
@@ -448,8 +426,6 @@ sub show {
         } elsif (defined($c) && ($c eq "\n")) {
           $self->exit_command_mode;
           my $cmd = $self->{cmdmgr}->call($self->{cmd_prompt}->{value});
-          endwin;
-          print($cmd);
           $cmd->exec();
 #           $self->execute_cmd($self->{cmd_prompt}->{value});
         } else {

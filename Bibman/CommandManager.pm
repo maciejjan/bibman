@@ -20,6 +20,8 @@ use strict;
 use warnings;
 use feature 'unicode_strings';
 
+use Bibman::Commands::CmdQuit;
+
 # TODO
 # class CommandManager
 # - command properties:
@@ -41,6 +43,9 @@ use feature 'unicode_strings';
 # cmdmgr.register({name => 'quit', args => []});
 # cmdmgr.register({name => '');
 # cmdmgr.instance({name => 'save', args => ['bibliography.bib']});
+#
+# TODO CommandManager cares for creating the relevant command object
+#      based on the command name
 
 sub new {
   my $class = shift;
@@ -76,15 +81,16 @@ sub call {
   my $cmdline = shift;
 
   my @args = split(/\s+/, $cmdline);
+  my $cmd_name = shift @args;
 
-  if (!defined($self->{commands}->{$args[0]})) {
-    # TODO exception
+  if (!defined($self->{commands}->{$cmd_name})) {
+    die "Unknown command: $cmd_name";
   }
-  my $cmd_data = ${$self->{commands}->{$args[0]}}[0];
-  # TODO find the right Command object for this call
-
+  my $cmd_data = ${$self->{commands}->{$cmd_name}}[0];
+#   # TODO find the right Command object for this call
+# 
   my $class = $cmd_data->{class};
-  return &$class();
+  return $class->new();
 }
 
 #
