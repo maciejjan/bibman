@@ -22,7 +22,7 @@ use feature 'unicode_strings';
 use Curses;
 use File::Basename;
 use Bibman::Bibliography;
-use Bibman::Commands;
+use Bibman::Commands::CmdQuit;
 use Bibman::CommandManager;
 use Bibman::EditScreen;
 use Bibman::StatusBar;
@@ -50,7 +50,7 @@ sub new {
   $self->{cmd_prompt}->{autocompleter}->add("save");
   $self->{cmd_prompt}->{autocompleter}->add("quit");
   
-  $self->{cmdmgr}->register(name => "quit", args => [], class => CmdQuit);
+  $self->{cmdmgr}->register({name => "quit", args => [], class => \&CmdQuit::new});
 
 #   $self->{cmdmgr}->register({
 #     name => "quit",
@@ -422,7 +422,8 @@ sub show {
           } elsif ($c eq "\n") {
             $self->execute_cmd('open-entry');
           } elsif ($c eq 'q') {
-            $self->execute_cmd('quit');
+            my $cmd = $self->{cmdmgr}->call('quit');
+            $cmd->exec();
           } elsif ($c eq ':') {
             $self->enter_command_mode;
           }
@@ -446,7 +447,10 @@ sub show {
           $self->exit_command_mode;
         } elsif (defined($c) && ($c eq "\n")) {
           $self->exit_command_mode;
-          my $cmd = $self->{cmdmgr}->instance($self->{cmd_prompt}->{value});
+          my $cmd = $self->{cmdmgr}->call($self->{cmd_prompt}->{value});
+          endwin;
+          print($cmd);
+          $cmd->exec();
 #           $self->execute_cmd($self->{cmd_prompt}->{value});
         } else {
           $self->{cmd_prompt}->key_pressed($c, $key);

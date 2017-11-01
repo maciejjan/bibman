@@ -75,14 +75,16 @@ sub call {
   my $self = shift;
   my $cmdline = shift;
 
-  @args = split(/\s+/, $cmdline);
+  my @args = split(/\s+/, $cmdline);
 
   if (!defined($self->{commands}->{$args[0]})) {
     # TODO exception
   }
-  die "Not implemented!";
+  my $cmd_data = ${$self->{commands}->{$args[0]}}[0];
   # TODO find the right Command object for this call
-  return $class->new(@$args);
+
+  my $class = $cmd_data->{class};
+  return &$class();
 }
 
 #

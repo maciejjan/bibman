@@ -1,18 +1,18 @@
+package CmdQuit;
+
 use Curses;
 
-package CmdQuit {
-  sub new {
-    my $class = shift;
-    my $self = {};
-    bless $self, $class;
-    return $self;
-  }
+sub new {
+  my $class = shift;
+  my $self = {};
+  bless $self, $class;
+  return $self;
+}
 
-  sub exec {
-    my $self = shift;
-    endwin;
-    exit 0;
-  }
+sub exec {
+  my $self = shift;
+  endwin;
+  exit 0;
 }
 
 # TODO commands are called with a function cmd_xxx, e.g.: cmd_add_entry()

@@ -23,6 +23,9 @@ use Curses;
 use Pod::Man;
 use Pod::Usage;
 
+use FindBin;
+use lib qw($Bin);
+
 use Bibman::MainScreen;
 use Bibman::StatusBar;
 
