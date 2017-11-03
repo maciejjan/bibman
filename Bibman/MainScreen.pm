@@ -22,7 +22,6 @@ use feature 'unicode_strings';
 use Curses;
 use File::Basename;
 use Bibman::Bibliography;
-# use Bibman::Commands::CmdQuit;
 use Bibman::CommandManager;
 use Bibman::EditScreen;
 use Bibman::StatusBar;
@@ -36,7 +35,7 @@ sub new {
     list   => new TabularList(4),
     status => new StatusBar(),
     cmd_prompt => new TextInput(""),
-    cmdmgr => new CommandManager(),
+    cmdmgr => undef,
     mode   => "normal",               # "normal" or "command"
     filename => undef,
     search_field => undef,
@@ -44,13 +43,16 @@ sub new {
     filter_field => undef,
     filter_pattern => undef
   };
+  $self->{cmdmgr} = new CommandManager($self);
   $self->{cmd_prompt}->{autocompleter} = new TrieAutocompleter();
   $self->{cmd_prompt}->{autocompleter}->add("add");
   $self->{cmd_prompt}->{autocompleter}->add("edit");
   $self->{cmd_prompt}->{autocompleter}->add("save");
   $self->{cmd_prompt}->{autocompleter}->add("quit");
   
+  $self->{cmdmgr}->register({name => "save", args => ["?file"], class => 'CmdSave'});
   $self->{cmdmgr}->register({name => "quit", args => [], class => 'CmdQuit'});
+#   $self->{cmdmgr}->register({name => "search", args => ["?field string"], class => 'CmdSearch'});
 
   bless $self, $class;
 }

@@ -20,36 +20,13 @@ use strict;
 use warnings;
 use feature 'unicode_strings';
 
+use Bibman::Commands::CmdSave;
 use Bibman::Commands::CmdQuit;
-
-# TODO
-# class CommandManager
-# - command properties:
-#   - name
-#   - arguments (type: file / oneof / string)
-#   - command class
-# - register
-# - autocomplete (in a separate class!)
-#   - "complete" function reference as a field of TextInput
-#     - input: string (the current value) -- or only the last token?!
-#     - output: a list of strings (value proposals)
-#     - TextInput implements cycling through completion proposals
-# - each command implements the following methods:
-#   - execute
-#   - undo
-#
-# usage example:
-# cmdmgr = new CommandManager;
-# cmdmgr.register({name => 'quit', args => []});
-# cmdmgr.register({name => '');
-# cmdmgr.instance({name => 'save', args => ['bibliography.bib']});
-#
-# TODO CommandManager cares for creating the relevant command object
-#      based on the command name
 
 sub new {
   my $class = shift;
   my $self = {
+    parent => shift,
     commands => {}
   };
   bless $self, $class;
@@ -61,12 +38,15 @@ sub register {
 
   if (!defined($cmd_data->{name})) {
     # TODO exception
+    die "No name supplied for a command!";
   }
   if (!defined($cmd_data->{args})) {
     # TODO exception
+    die "No argument structure supplied for the command $cmd_data->{name}!";
   }
   if (!defined($cmd_data->{class})) {
     # TODO exception
+    die "No class supplied for the command $cmd_data->{name}!";
   }
 
   if (!defined($self->{commands}->{$cmd_data->{name}})) {
@@ -87,10 +67,13 @@ sub call {
     die "Unknown command: $cmd_name";
   }
   my $cmd_data = ${$self->{commands}->{$cmd_name}}[0];
+  for my $cmd_data (@{$self->{commands}->{$cmd_name}}) {
+    last if (match_args(\@args, $cmd_data->{args}));
+  }
 #   # TODO find the right Command object for this call
 # 
   my $class = $cmd_data->{class};
-  return $class->new();
+  return $class->new($self->{parent}, @args);
 }
 
 #
@@ -100,6 +83,21 @@ sub autocomplete {
   my $pos = shift;      # cursor position
   # TODO
   die "Not implemented!";
+}
+
+sub match_args {
+  my ($ref_args, $ref_argstruct) = @_;
+  my @args = @$ref_args;
+  my @argstruct = @$ref_argstruct;
+  while (($#args >= 0) && ($#argstruct >= 0)) {
+    $arg = shift @args;
+    $argtype = shift @argstruct;
+    while (($#args < $#argstruct) && ($argtype =~ m/\?.*/g)) {
+      $argtype = shift @argstruct;
+    }
+    # TODO verify the type of $arg
+  }
+  return 1;
 }
 
 1;
