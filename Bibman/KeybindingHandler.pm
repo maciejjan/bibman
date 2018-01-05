@@ -22,11 +22,17 @@ use warnings;
 sub new {
   my $class = shift;
   my $self = {
-    cmdmgr => shift,
+    cmdinterp => shift,
     bindings => {
       "d" => "delete",
+      "g" => "go-to-first",
+      "G" => "go-to-last",
+      "j" => "go-down",
+      "k" => "go-up",
       "u" => "undo",
-      "q" => "quit"
+      "q" => "quit",
+      "+" => "move-down",
+      "-" => "move-up"
     }
   };
   bless $self, $class;
@@ -48,7 +54,7 @@ sub handle_keypress {
   my $key_tr = $self->translate_key($c, $key);
   if ((defined($key_tr)) && (defined($self->{bindings}->{$key_tr}))) {
     my $cmdline = $self->{bindings}->{$key_tr};
-    $self->{cmdmgr}->execute($cmdline);
+    $self->{cmdinterp}->execute($cmdline);
   }
 }
 

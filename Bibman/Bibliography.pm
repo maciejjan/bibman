@@ -122,6 +122,13 @@ sub delete_entry {
   splice @{$self->{entries}}, $idx, 1;
 }
 
+sub replace_entry_at {
+  my $self = shift;
+  my $idx = shift;
+  my $entry = shift;
+  ${$self->{entries}}[$idx] = $entry;
+}
+
 sub get_type {
   my $self = shift;
   my $idx = shift;

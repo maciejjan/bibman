@@ -360,7 +360,11 @@ sub show {
       $self->draw;
     }  else {
       if ($self->{mode} eq "normal") {
-        $self->{kbdhandler}->handle_keypress($c, $key);
+        if ((defined($c)) && ($c eq ':')) {
+          $self->enter_command_mode;
+        } else {
+          $self->{kbdhandler}->handle_keypress($c, $key);
+        }
 #         if ((defined($c)) && ($c eq 'q')) {
 #           $self->quit;
 #         }

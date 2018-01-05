@@ -28,7 +28,7 @@ use lib "$Bin/.";
 use Bibman::MainScreen;
 use Bibman::StatusBar;
 
-use constant VERSION => "0.1-alpha";
+use constant VERSION => "0.2.0-alpha";
 
 my $INPUT_FILE;
 my $arg = shift @ARGV;

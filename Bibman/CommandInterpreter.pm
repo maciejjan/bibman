@@ -28,6 +28,12 @@ sub new {
 #       add => { do => \&do_add, undo => \&undo_add },
       delete => { do => \&do_delete, undo => \&undo_delete },
 #       edit => { do => \&do_edit, undo => \&undo_edit },
+      'go-down' => { do => \&do_go_down },
+      'go-to-first' => { do => \&do_go_to_first },
+      'go-to-last' => { do => \&do_go_to_last },
+      'go-up' => { do => \&do_go_up },
+      'move-down' => { do => \&do_move_down, undo => \&undo_move_down },
+      'move-up' => { do => \&do_move_up, undo => \&undo_move_up },
       open => { do => \&do_open },
       undo => { do => \&do_undo },
       quit => { do => \&do_quit },
@@ -147,40 +153,85 @@ sub undo_delete {
   $self->{model}->add_entry_at($cmd->{hl_idx}, $cmd->{hl_entry});
   $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}, format_entry($cmd->{hl_entry}));
   $self->{mainscr}->{list}->redraw;
+  $self->{mainscr}->{list}->go_to_item($cmd->{hl_idx});
   return 1;
 }
 
-# # TODO return false if impossible!
-# # TODO pass $model
-# sub do_move_up {
-#   my $self = shift;
-#   my $cmd = shift;
-#   $entry_above = $model->get($idx-1);
-#   $model->replace($idx, $entry_above);
-#   $model->replace($idx-1, $entry);
-# }
-# 
-# sub undo_move_up {
-#   my $self = shift;
-#   my $cmd = shift;
-#   do_move_down($idx, $entry);
-# }
-# 
-# sub do_move_down {
-#   my $self = shift;
-#   my $cmd = shift;
-#   $entry_below = $model->get($idx+1);
-#   $model->replace($idx, $entry_below);
-#   $model->replace($idx+1, $entry);
-# }
-# 
-# sub undo_move_down {
-#   my $self = shift;
-#   my $cmd = shift;
-#   do_move_up($idx, $entry);
-# }
+sub do_move_up {
+  my $self = shift;
+  my $cmd = shift;
+  my $idx = $cmd->{hl_idx};
+  my $entry = $cmd->{hl_entry};
+  if ($idx <= 0) {
+    return 0;
+  }
+  my $entry_above = $self->{model}->get($idx-1);
+  $self->{model}->replace_entry_at($idx, $entry_above);
+  $self->{model}->replace_entry_at($idx-1, $entry);
+  $self->{mainscr}->{list}->update_item($idx, format_entry($entry_above));
+  $self->{mainscr}->{list}->update_item($idx-1, format_entry($entry));
+  $self->{mainscr}->{list}->redraw;
+  $self->{mainscr}->{list}->go_up;
+  return 1;
+}
 
-# TODO functions operating on the view etc.
+sub undo_move_up {
+  my $self = shift;
+  my $cmd = shift;
+  $cmd->{hl_idx}--;
+  do_move_down($self, $cmd);
+  $self->{mainscr}->{list}->go_to_item($cmd->{hl_idx}+1);
+}
+
+sub do_move_down {
+  my $self = shift;
+  my $cmd = shift;
+  my $idx = $cmd->{hl_idx};
+  my $entry = $cmd->{hl_entry};
+  if ($idx >= $#{$self->{model}->{entries}}) {
+    return 0;
+  }
+  my $entry_below = $self->{model}->get($idx+1);
+  $self->{model}->replace_entry_at($idx, $entry_below);
+  $self->{model}->replace_entry_at($idx+1, $entry);
+  $self->{mainscr}->{list}->update_item($idx, format_entry($entry_below));
+  $self->{mainscr}->{list}->update_item($idx+1, format_entry($entry));
+  $self->{mainscr}->{list}->redraw;
+  $self->{mainscr}->{list}->go_down;
+  return 1;
+}
+
+sub undo_move_down {
+  my $self = shift;
+  my $cmd = shift;
+  $cmd->{hl_idx}++;
+  do_move_up($self, $cmd);
+  $self->{mainscr}->{list}->go_to_item($cmd->{hl_idx}-1);
+}
+
+sub do_go_up {
+  my $self = shift;
+  my $cmd = shift;
+  $self->{mainscr}->{list}->go_up();
+}
+
+sub do_go_down {
+  my $self = shift;
+  my $cmd = shift;
+  $self->{mainscr}->{list}->go_down();
+}
+
+sub do_go_to_first {
+  my $self = shift;
+  my $cmd = shift;
+  $self->{mainscr}->{list}->go_to_first();
+}
+
+sub do_go_to_last {
+  my $self = shift;
+  my $cmd = shift;
+  $self->{mainscr}->{list}->go_to_last();
+}
 
 sub do_open {
   my $self = shift;
