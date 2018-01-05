@@ -192,6 +192,9 @@ sub do_open {
 
 sub do_undo {
   my $self = shift;
+  if ($self->{undo_pos} < 0) {
+    return 0;
+  }
   my $cmd = ${$self->{undo_list}}[$self->{undo_pos}];
   $self->{commands}->{$cmd->{name}}->{undo}->($self, $cmd);
   $self->{undo_pos}--;

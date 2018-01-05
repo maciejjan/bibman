@@ -27,17 +27,17 @@ use lib "$Bin/.";
 use Bibman::Bibliography;
 use Bibman::CommandInterpreter;
 use Bibman::EditScreen;
+use Bibman::KeybindingHandler;
 use Bibman::TabularList;
 use Bibman::TextInput;
 use Bibman::StatusBar;
 
 sub new {
   my $class = shift;
-#   my $model = new Bibliography();
   my $list = new TabularList(4);
   my $self = {
-#     model   => $model,
     cmdinterp => undef,
+    kbdhandler => undef,
     list   => $list,
     status => new StatusBar(),
     cmd_prompt => new TextInput(""),
@@ -49,6 +49,7 @@ sub new {
     filter_pattern => undef
   };
   $self->{cmdinterp} = new CommandInterpreter($self);
+  $self->{kbdhandler} = new KeybindingHandler($self->{cmdinterp});
   bless $self, $class;
 }
 
@@ -359,13 +360,14 @@ sub show {
       $self->draw;
     }  else {
       if ($self->{mode} eq "normal") {
-        if ((defined($c)) && ($c eq 'q')) {
-          $self->quit;
-        }
-        if (defined($c)) {
-          if ($c eq ':') {
-            $self->enter_command_mode;
-          }
+        $self->{kbdhandler}->handle_keypress($c, $key);
+#         if ((defined($c)) && ($c eq 'q')) {
+#           $self->quit;
+#         }
+#         if (defined($c)) {
+#           if ($c eq ':') {
+#             $self->enter_command_mode;
+#           }
 #           if ($c eq 'k') {
 #             $self->execute_cmd('go-up');
 #           } elsif ($c eq 'j') {
@@ -419,7 +421,7 @@ sub show {
 #           } elsif ($key == KEY_RESIZE) {
 #             $self->draw;
 #           }
-        }
+#         }
       } elsif ($self->{mode} eq "command") {
         if (defined($key) && ($key == KEY_BACKSPACE) && (!$self->{cmd_prompt}->{value})) {
           $self->exit_command_mode;
