@@ -26,6 +26,12 @@ use Bibman::Bibliography;
 use Bibman::StatusBar;
 use Bibman::TextInput;
 
+sub show_edit_screen {
+  my $properties = shift;
+  # TODO use the EditScreen class first, then maybe reimplement without objects
+  # TODO return the new properties
+}
+
 sub new {
   my $class = shift;
   my $self = {

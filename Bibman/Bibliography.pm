@@ -39,15 +39,29 @@ my $fields = {
 
 sub new {
   my $class = shift;
+  my $filename = shift;
   my $self = {
+    filename => undef,
     entries => []
   };
   bless $self, $class;
+  if (defined($filename)) {
+    $self->read($filename);
+  }
+  return $self;
+}
+
+sub get {
+  my $self = shift;
+  my $idx = shift;
+  return ${$self->{entries}}[$idx];
 }
 
 sub read {
   my $self = shift;
   my $filename = shift;
+  $self->{filename} = $filename;
+  $self->{entries} = [];
   my $bibfile = Text::BibTeX::File->new($filename, { BINMODE => 'utf-8' });
   while (my $entry = Text::BibTeX::Entry->new($bibfile)) {
     push @{$self->{entries}}, $entry;
@@ -55,6 +69,7 @@ sub read {
   $bibfile->close;
 }
 
+# TODO change: filename implicit!
 sub write {
   my $self = shift;
   my $filename = shift;
@@ -92,12 +107,13 @@ sub add_entry {
 sub add_entry_at {
   my $self = shift;
   my $idx = shift;
-  my $type = shift;
-  my $entry = Text::BibTeX::Entry->new();
-  $entry->set_metatype(Text::BibTeX::BTE_REGULAR);
-  $entry->set_type($type);
-  splice @{$self->{entries}}, $idx+1, 0, $entry;
-  return $entry;
+#   my $type = shift;
+#   my $entry = Text::BibTeX::Entry->new();
+  my $entry = shift;
+#   $entry->set_metatype(Text::BibTeX::BTE_REGULAR);
+#   $entry->set_type($type);
+  splice @{$self->{entries}}, $idx, 0, $entry;
+#   return $entry;
 }
 
 sub delete_entry {

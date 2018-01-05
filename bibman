@@ -22,6 +22,8 @@ use feature 'unicode_strings';
 use Curses;
 use Pod::Man;
 use Pod::Usage;
+use FindBin qw($Bin);
+use lib "$Bin/.";
 
 use Bibman::MainScreen;
 use Bibman::StatusBar;
@@ -65,7 +67,7 @@ init_pair(StatusBar::INFO, COLOR_GREEN, -1);
 init_pair(StatusBar::ERROR, COLOR_RED, -1);
 
 my $main = new MainScreen();
-$main->open_bibliography($INPUT_FILE);
+$main->{cmdinterp}->execute("open $INPUT_FILE");
 $main->show($win);
 
 endwin;
