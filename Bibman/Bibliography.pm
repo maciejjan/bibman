@@ -93,6 +93,16 @@ sub write {
 #   $bibfile->close;
 # }
 
+sub create_entry {
+  my $self = shift;
+  my $properties = shift;
+  my $entry = Text::BibTeX::Entry->new();
+  $entry->set_metatype(Text::BibTeX::BTE_REGULAR);
+  $entry->set_type($properties->{entry_type});
+  set_properties($entry, $properties);
+  return $entry;
+}
+
 sub add_entry {
   my $self = shift;
   my $type = shift;
@@ -165,6 +175,8 @@ sub get_properties {
   my $entry = shift;
 
   my %properties = ();
+  $properties{key} = $entry->key;
+  $properties{entry_type} = $entry->type;
   for my $field (@{get_fields_for_type($entry->type)}) {
     $properties{$field} = get_property($entry, $field);
   }

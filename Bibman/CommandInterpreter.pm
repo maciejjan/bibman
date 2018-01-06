@@ -19,15 +19,17 @@ package CommandInterpreter;
 use strict;
 use warnings;
 
+use Bibman::EditScreen;
+
 sub new {
   my $class = shift;
   my $self = {
     model => new Bibliography(),
     mainscr => shift,
     commands => {
-#       add => { do => \&do_add, undo => \&undo_add },
+      add => { do => \&do_add, undo => \&undo_add },
       delete => { do => \&do_delete, undo => \&undo_delete },
-#       edit => { do => \&do_edit, undo => \&undo_edit },
+      edit => { do => \&do_edit, undo => \&undo_edit },
       'go-down' => { do => \&do_go_down },
       'go-to-first' => { do => \&do_go_to_first },
       'go-to-last' => { do => \&do_go_to_last },
@@ -100,7 +102,6 @@ sub update_view {
 sub add_to_undo_list {
   my $self = shift;
   my $cmd = shift;
-#   # TODO also clear everything after undo_pos
   splice @{$self->{undo_list}}, $self->{undo_pos}+1;
   push @{$self->{undo_list}}, $cmd;
   $self->{undo_pos}++;
@@ -109,34 +110,47 @@ sub add_to_undo_list {
 sub redo {
 }
 
-# sub do_add {
-#   my $self = shift;
-#   my $cmd = shift;
-#   $new_entry = show_edit_screen();
-#   $model->insert($idx+1, $new_entry);
-#   $self->update_view();
-# }
-# 
-# sub undo_add {
-#   my $self = shift;
-#   my $cmd = shift;
-#   $view = shift;
-#   $model->delete($idx+1);
-# }
-# 
-# sub do_edit {
-#   my $self = shift;
-#   my $cmd = shift;
-#   $updated_entry = show_edit_screen($entry);
-#   $model->delete($idx);
-#   $model->insert($idx, $updated_entry);
-# }
-# 
-# sub undo_edit {
-#   my $self = shift;
-#   my $cmd = shift;
-#   $model->replace($idx, $entry);
-# }
+sub do_add {
+  my $self = shift;
+  my $cmd = shift;
+  my $editscr = new EditScreen({ entry_type => "article" });
+  my $properties = $editscr->show($self->{mainscr}->{win});
+  my $new_entry = $self->{model}->create_entry($properties);
+  $self->{model}->add_entry_at($cmd->{hl_idx}+1, $new_entry);
+  $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}+1, format_entry($new_entry));
+  $self->{mainscr}->{list}->redraw;
+  $self->{mainscr}->{list}->go_up;
+  return 1;
+}
+
+sub undo_add {
+  my $self = shift;
+  my $cmd = shift;
+  $self->{model}->delete_entry($cmd->{hl_idx}+1);
+}
+
+# TODO return 0 if nothing changed
+sub do_edit {
+  my $self = shift;
+  my $cmd = shift;
+  my $editscr = new EditScreen(Bibliography::get_properties($cmd->{hl_entry}));
+  my $properties = $editscr->show($self->{mainscr}->{win});
+  my $updated_entry = $self->{model}->create_entry($properties);
+  $self->{model}->replace_entry_at($cmd->{hl_idx}, $updated_entry);
+  $self->{mainscr}->{list}->update_item($cmd->{hl_idx}, format_entry($updated_entry));
+  $self->{mainscr}->{list}->redraw;
+  return 1;
+}
+
+sub undo_edit {
+  my $self = shift;
+  my $cmd = shift;
+  $self->{model}->replace_entry_at($cmd->{hl_idx}, $cmd->{hl_entry});
+  $self->{mainscr}->{list}->update_item($cmd->{hl_idx}, format_entry($cmd->{hl_entry}));
+  $self->{mainscr}->{list}->redraw;
+  $self->{mainscr}->{list}->go_to_item($cmd->{hl_idx});
+  return 1;
+}
 
 sub do_delete {
   my $self = shift;
