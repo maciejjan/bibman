@@ -24,17 +24,19 @@ sub new {
   my $self = {
     cmdinterp => shift,
     bindings => {
-      "a" => "add",
-      "d" => "delete",
-      "e" => "edit",
-      "g" => "go-to-first",
-      "G" => "go-to-last",
-      "j" => "go-down",
-      "k" => "go-up",
-      "u" => "undo",
-      "q" => "quit",
-      "+" => "move-down",
-      "-" => "move-up"
+      "a"    => "add",
+      "d"    => "delete",
+      "e"    => "edit",
+      "g"    => "go-to-first",
+      "G"    => "go-to-last",
+      "j"    => "go-down",
+      "k"    => "go-up",
+      "o"    => "open-entry",
+      "u"    => "undo",
+      "q"    => "quit",
+      "+"    => "move-down",
+      "-"    => "move-up",
+      "<CR>" => "open-entry"
     }
   };
   bless $self, $class;

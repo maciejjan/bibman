@@ -18,6 +18,7 @@ package CommandInterpreter;
 
 use strict;
 use warnings;
+use File::Basename;
 
 use Bibman::Bibliography;
 use Bibman::EditScreen;
@@ -38,6 +39,7 @@ sub new {
       'move-down' => { do => \&do_move_down, undo => \&undo_move_down },
       'move-up' => { do => \&do_move_up, undo => \&undo_move_up },
       open => { do => \&do_open },
+      'open-entry' => { do => \&do_open_entry },
       undo => { do => \&do_undo },
       quit => { do => \&do_quit },
     },
@@ -280,6 +282,17 @@ sub do_open {
   $self->{model} = new Bibliography($cmd->{args}[0]);
   $self->update_view();
   return 1;
+}
+
+sub do_open_entry {
+  my $self = shift;
+  my $cmd = shift;
+  my $dir = dirname($self->{model}->{filename});
+  my $key = $cmd->{hl_entry}->key;
+  my $filename =  "$dir/$key.pdf";
+  if (-e $filename) {
+    system "xdg-open $filename";
+  }
 }
 
 sub do_undo {
