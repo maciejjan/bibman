@@ -19,6 +19,7 @@ package CommandInterpreter;
 use strict;
 use warnings;
 
+use Bibman::Bibliography;
 use Bibman::EditScreen;
 
 sub new {
@@ -115,11 +116,12 @@ sub do_add {
   my $cmd = shift;
   my $editscr = new EditScreen({ entry_type => "article" });
   my $properties = $editscr->show($self->{mainscr}->{win});
+  $self->{mainscr}->draw;
   my $new_entry = $self->{model}->create_entry($properties);
   $self->{model}->add_entry_at($cmd->{hl_idx}+1, $new_entry);
   $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}+1, format_entry($new_entry));
   $self->{mainscr}->{list}->redraw;
-  $self->{mainscr}->{list}->go_up;
+  $self->{mainscr}->{list}->go_down;
   return 1;
 }
 
@@ -127,14 +129,39 @@ sub undo_add {
   my $self = shift;
   my $cmd = shift;
   $self->{model}->delete_entry($cmd->{hl_idx}+1);
+  $self->{mainscr}->{list}->delete_item($cmd->{hl_idx}+1);
+  $self->{mainscr}->{list}->redraw;
+  $self->{mainscr}->{list}->go_to_item($cmd->{hl_idx});
 }
 
-# TODO return 0 if nothing changed
 sub do_edit {
   my $self = shift;
   my $cmd = shift;
   my $editscr = new EditScreen(Bibliography::get_properties($cmd->{hl_entry}));
   my $properties = $editscr->show($self->{mainscr}->{win});
+  my $old_properties = Bibliography::get_properties($cmd->{hl_entry});
+  $self->{mainscr}->draw;
+
+  # return 0 if nothing changed
+  if ($properties->{entry_type} eq $old_properties->{entry_type}) {
+    my @fields = @{Bibliography::get_fields_for_type($properties->{entry_type})};
+    my $equal = 1;
+    for my $field (@fields) {
+      if (!defined($properties->{$field}) && (!defined($old_properties->{$field}))) {
+        next;
+      } elsif (!defined($properties->{$field}) || (!defined($old_properties->{$field}))) {
+        $equal = 0;
+        last;
+      } elsif ($properties->{$field} ne $old_properties->{$field}) {
+        $equal = 0;
+        last;
+      }
+    }
+    if ($equal) {
+      return 0;
+    }
+  }
+
   my $updated_entry = $self->{model}->create_entry($properties);
   $self->{model}->replace_entry_at($cmd->{hl_idx}, $updated_entry);
   $self->{mainscr}->{list}->update_item($cmd->{hl_idx}, format_entry($updated_entry));
