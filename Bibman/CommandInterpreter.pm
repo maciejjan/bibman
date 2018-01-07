@@ -30,8 +30,10 @@ sub new {
     mainscr => shift,
     commands => {
       add => { do => \&do_add, undo => \&undo_add },
+      'backward-search' => { do => \&do_backward_search },
       delete => { do => \&do_delete, undo => \&undo_delete },
       edit => { do => \&do_edit, undo => \&undo_edit },
+      filter => { do => \&do_filter },
       'go-down' => { do => \&do_go_down },
       'go-to-first' => { do => \&do_go_to_first },
       'go-to-last' => { do => \&do_go_to_last },
@@ -40,6 +42,9 @@ sub new {
       'move-up' => { do => \&do_move_up, undo => \&undo_move_up },
       open => { do => \&do_open },
       'open-entry' => { do => \&do_open_entry },
+      search => { do => \&do_search },
+      'search-next' => { do => \&do_search_next },
+      'search-prev' => { do => \&do_search_prev },
       undo => { do => \&do_undo },
       quit => { do => \&do_quit },
     },
@@ -293,6 +298,183 @@ sub do_open_entry {
   if (-e $filename) {
     system "xdg-open $filename";
   }
+}
+
+# sub get_search_args {
+#   if ($#_ > 0) {
+#     return $_[0], $_[1];
+#   } else {
+#     return undef, $_[0];
+#   }
+# }
+# 
+# sub set_search_args {
+#   my $self = shift;
+#   my ($field, $pattern) = get_search_args(@_);
+#   $self->{search_field} = $field;
+#   $self->{search_pattern} = $pattern;
+#   if (!defined($self->{search_pattern})) {
+#     $self->{search_pattern} = "";
+#   }
+# }
+# 
+# sub search {
+#   my $self = shift;
+#   $self->set_search_args(@_);
+#   $self->search_next;
+# }
+# 
+# sub search_next {
+#   my $self = shift;
+#   my $idx = $self->{list}->{highlight};
+#   do {
+#     $idx++;
+#     if ($idx > $#{$self->{list}->{items}}) {
+#       $idx = 0;
+#     }
+#     $idx = $self->{list}->next_visible($idx);
+#     last if (!defined($idx));
+#   } while (!($self->match($idx, $self->{search_field}, $self->{search_pattern})
+#              || $idx == $self->{list}->{highlight}));
+#   $self->{list}->go_to_item($idx);
+# }
+# 
+# sub search_prev {
+#   my $self = shift;
+#   my $idx = $self->{list}->{highlight};
+#   do {
+#     $idx--;
+#     if ($idx < 0) {
+#       $idx = $#{$self->{list}->{items}};
+#     }
+#     $idx = $self->{list}->prev_visible($idx);
+#     last if (!defined($idx));
+#   } while (!($self->match($idx, $self->{search_field}, $self->{search_pattern})
+#              || $idx == $self->{list}->{highlight}));
+#   $self->{list}->go_to_item($idx);
+# }
+
+sub match {
+  my $self = shift;
+  my $idx = shift;
+  my $field = shift;
+  my $pattern = shift;
+  if (!defined($pattern)) {
+    $field = $self->{search_args}->{field};
+    $pattern = $self->{search_args}->{pattern};
+  }
+  my $entry = $self->{model}->get($idx);
+  if (defined($field)) {
+    my $value = Bibliography::get_property($entry, $field);
+    if ((defined($value)) && ($value =~ /$pattern/)) {
+      return 1;
+    }
+  } else {
+    for (my $i = 0; $i < $self->{mainscr}->{list}->{columns}; $i++) {
+      my $list_item = ${$self->{mainscr}->{list}->{items}}[$idx];
+      if (${$list_item->{values}}[$i] =~ /$pattern/) {
+        return 1;
+      }
+    }
+  }
+  return 0;
+}
+
+sub parse_search_args {
+  if ($#_ > 0) {
+    return $_[0], $_[1];
+  } else {
+    return undef, $_[0];
+  }
+}
+
+sub set_search_args {
+  my $self = shift;
+  my ($field, $pattern) = parse_search_args(@_);
+  if (defined($pattern)) {
+    $self->{search_args} = { field => $field, pattern => $pattern};
+  } else {
+    $self->{search_args} = undef;
+  }
+}
+
+sub do_search {
+  my $self = shift;
+  my $cmd = shift;
+  $self->set_search_args(@{$cmd->{args}});
+  do_search_next($self, $cmd);
+}
+
+sub do_backward_search {
+  my $self = shift;
+  my $cmd = shift;
+  $self->set_search_args(@{$cmd->{args}});
+  do_search_prev($self, $cmd);
+}
+
+sub do_search_next {
+  my $self = shift;
+  my $cmd = shift;
+  if (!defined($self->{search_args})) {
+    return 0;
+  }
+  my $idx = $self->{mainscr}->{list}->{highlight};
+  do {
+    $idx++;
+    if ($idx > $#{$self->{mainscr}->{list}->{items}}) {
+      $idx = 0;
+    }
+    $idx = $self->{mainscr}->{list}->next_visible($idx);
+    last if (!defined($idx));
+  } while (!($self->match($idx) || $idx == $self->{mainscr}->{list}->{highlight}));
+  $self->{mainscr}->{list}->go_to_item($idx);
+  return 1;
+}
+
+sub do_search_prev {
+  my $self = shift;
+  my $cmd = shift;
+  if (!defined($self->{search_args})) {
+    return 0;
+  }
+  my $idx = $self->{mainscr}->{list}->{highlight};
+  do {
+    $idx--;
+    if ($idx < 0) {
+      $idx = $#{$self->{mainscr}->{list}->{items}};
+    }
+    $idx = $self->{mainscr}->{list}->prev_visible($idx);
+    last if (!defined($idx));
+  } while (!($self->match($idx) || $idx == $self->{mainscr}->{list}->{highlight}));
+  $self->{mainscr}->{list}->go_to_item($idx);
+  return 1;
+}
+
+sub do_filter {
+  my $self = shift;
+  my $cmd = shift;
+  my ($field, $pattern) = parse_search_args(@{$cmd->{args}});
+  if (!defined($pattern) || (!$pattern)) {
+    for my $item (@{$self->{mainscr}->{list}->{items}}) {
+      $item->{visible} = 1;
+    }
+  } else {
+    for (my $i = 0; $i <= $#{$self->{model}->{entries}}; $i++) {
+      my $item = ${$self->{mainscr}->{list}->{items}}[$i];
+      if ($self->match($i, $field, $pattern)) {
+        $item->{visible} = 1;
+      } else {
+        $item->{visible} = 0;
+      }
+    }
+  }
+  my $list = $self->{mainscr}->{list};
+  my $idx = $list->next_visible($list->{highlight});
+  if (!defined($idx)) {
+    $idx = $list->prev_visible($list->{highlight});
+  }
+  $list->go_to_item($idx);
+  $self->{mainscr}->draw;
 }
 
 sub do_undo {

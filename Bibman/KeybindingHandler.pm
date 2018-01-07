@@ -31,11 +31,15 @@ sub new {
       "G"    => "go-to-last",
       "j"    => "go-down",
       "k"    => "go-up",
+      "n"    => "search-next",
+      "N"    => "search-prev",
       "o"    => "open-entry",
       "u"    => "undo",
       "q"    => "quit",
       "+"    => "move-down",
       "-"    => "move-up",
+      "/"    => "search",
+      "?"    => "backward-search",
       "<CR>" => "open-entry"
     }
   };
