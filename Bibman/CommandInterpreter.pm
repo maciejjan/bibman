@@ -425,7 +425,9 @@ sub do_search_next {
       $idx = 0;
     }
     $idx = $self->{mainscr}->{list}->next_visible($idx);
-    last if (!defined($idx));
+    if (!defined($idx)) {
+      $idx = $self->{mainscr}->{list}->next_visible(0);
+    }
   } while (!($self->match($idx) || $idx == $self->{mainscr}->{list}->{highlight}));
   $self->{mainscr}->{list}->go_to_item($idx);
   return 1;
@@ -444,7 +446,9 @@ sub do_search_prev {
       $idx = $#{$self->{mainscr}->{list}->{items}};
     }
     $idx = $self->{mainscr}->{list}->prev_visible($idx);
-    last if (!defined($idx));
+    if (!defined($idx)) {
+      $idx = $self->{mainscr}->{list}->prev_visible($#{$self->{mainscr}->{list}->{items}});
+    }
   } while (!($self->match($idx) || $idx == $self->{mainscr}->{list}->{highlight}));
   $self->{mainscr}->{list}->go_to_item($idx);
   return 1;
