@@ -34,6 +34,7 @@ sub new {
       "n"    => "search-next",
       "N"    => "search-prev",
       "o"    => "open-entry",
+      "s"    => "save",
       "u"    => "undo",
       "q"    => "quit",
       "+"    => "move-down",

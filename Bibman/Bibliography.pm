@@ -72,9 +72,9 @@ sub read {
 # TODO change: filename implicit!
 sub write {
   my $self = shift;
-  my $filename = shift;
+#   my $filename = shift;
 
-  open(my $fh, ">:encoding(utf-8)", $filename);
+  open(my $fh, ">:encoding(utf-8)", $self->{filename});
   for my $entry (@{$self->{entries}}) {
     print $fh $entry->print_s();
   }

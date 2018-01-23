@@ -22,6 +22,7 @@ use File::Basename;
 
 use Bibman::Bibliography;
 use Bibman::EditScreen;
+use Bibman::StatusBar;
 
 sub new {
   my $class = shift;
@@ -42,6 +43,7 @@ sub new {
       'move-up' => { do => \&do_move_up, undo => \&undo_move_up },
       open => { do => \&do_open },
       'open-entry' => { do => \&do_open_entry },
+      save => { do => \&do_save },
       search => { do => \&do_search },
       'search-next' => { do => \&do_search_next },
       'search-prev' => { do => \&do_search_prev },
@@ -191,6 +193,9 @@ sub do_delete {
   my $cmd = shift;
   $self->{model}->delete_entry($cmd->{hl_idx});
   $self->{mainscr}->{list}->delete_item($cmd->{hl_idx});
+  if (!defined($self->{mainscr}->{list}->next_visible($cmd->{hl_idx}))) {
+    $self->{mainscr}->{list}->go_up;
+  }
   $self->{mainscr}->{list}->redraw;
   return 1;
 }
@@ -298,6 +303,16 @@ sub do_open_entry {
   if (-e $filename) {
     system "xdg-open $filename";
   }
+}
+
+sub do_save {
+  my $self = shift;
+  my $cmd = shift;
+  if ($#{$cmd->{args}} > 0) {
+    $self->{model}->{filename} = ${$cmd->{args}}[0];
+  }
+  $self->{model}->write;
+  $self->{mainscr}->{status}->set("Saved to $self->{model}->{filename}.", StatusBar::INFO);
 }
 
 # sub get_search_args {
