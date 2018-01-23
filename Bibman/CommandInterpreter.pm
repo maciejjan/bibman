@@ -315,60 +315,6 @@ sub do_save {
   $self->{mainscr}->{status}->set("Saved to $self->{model}->{filename}.", StatusBar::INFO);
 }
 
-# sub get_search_args {
-#   if ($#_ > 0) {
-#     return $_[0], $_[1];
-#   } else {
-#     return undef, $_[0];
-#   }
-# }
-# 
-# sub set_search_args {
-#   my $self = shift;
-#   my ($field, $pattern) = get_search_args(@_);
-#   $self->{search_field} = $field;
-#   $self->{search_pattern} = $pattern;
-#   if (!defined($self->{search_pattern})) {
-#     $self->{search_pattern} = "";
-#   }
-# }
-# 
-# sub search {
-#   my $self = shift;
-#   $self->set_search_args(@_);
-#   $self->search_next;
-# }
-# 
-# sub search_next {
-#   my $self = shift;
-#   my $idx = $self->{list}->{highlight};
-#   do {
-#     $idx++;
-#     if ($idx > $#{$self->{list}->{items}}) {
-#       $idx = 0;
-#     }
-#     $idx = $self->{list}->next_visible($idx);
-#     last if (!defined($idx));
-#   } while (!($self->match($idx, $self->{search_field}, $self->{search_pattern})
-#              || $idx == $self->{list}->{highlight}));
-#   $self->{list}->go_to_item($idx);
-# }
-# 
-# sub search_prev {
-#   my $self = shift;
-#   my $idx = $self->{list}->{highlight};
-#   do {
-#     $idx--;
-#     if ($idx < 0) {
-#       $idx = $#{$self->{list}->{items}};
-#     }
-#     $idx = $self->{list}->prev_visible($idx);
-#     last if (!defined($idx));
-#   } while (!($self->match($idx, $self->{search_field}, $self->{search_pattern})
-#              || $idx == $self->{list}->{highlight}));
-#   $self->{list}->go_to_item($idx);
-# }
-
 sub match {
   my $self = shift;
   my $idx = shift;
