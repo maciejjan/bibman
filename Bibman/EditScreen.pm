@@ -29,9 +29,8 @@ use Bibman::TextInput;
 sub new {
   my $class = shift;
   my $self = {
-    entry => shift,
+    properties => shift,
     fields => undef,
-    properties => undef,
     focus => undef,
     inputs => undef,
     height => undef,
@@ -40,8 +39,7 @@ sub new {
     highlight => 0,
     top => 0
   };
-  $self->{properties} = Bibliography::get_properties($self->{entry});
-  $self->{fields} = Bibliography::get_fields_for_type($self->{entry}->type);
+  $self->{fields} = Bibliography::get_fields_for_type($self->{properties}->{entry_type});
   reset_inputs($self);
   bless $self, $class;
 }
@@ -107,7 +105,6 @@ sub change_type {
   my $new_type = shift;
   $self->{fields} = Bibliography::get_fields_for_type($new_type);
   $self->{properties}->{entry_type} = $new_type;
-  $self->{entry}->set_type($new_type);
   $self->reset_inputs;
 }
 
@@ -181,8 +178,7 @@ sub show {
             curs_set(1);
             $self->{inputs}->{$self->{focus}}->redraw;
           } elsif ($c eq 'q') {
-            Bibliography::set_properties($self->{entry}, $self->{properties});
-            return;
+            return $self->{properties};
           }
         } elsif (defined($key)) {
           if ($key == KEY_UP) {

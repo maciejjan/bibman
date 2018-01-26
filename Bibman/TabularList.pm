@@ -56,7 +56,7 @@ sub add_item_at {
     visible => 1
   };
   $self->update_col_widths($values);
-  splice @{$self->{items}}, $idx+1, 0, $item;
+  splice @{$self->{items}}, $idx, 0, $item;
 }
 
 sub update_item {
