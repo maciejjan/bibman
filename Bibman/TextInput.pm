@@ -116,7 +116,7 @@ sub key_pressed {
     } else {
       substr($self->{value}, $self->{pos}, 0) = $c;
       $self->{pos}++;
-      $self->{autocompleter}->reset;
+#        $self->{autocompleter}->reset;
     }
   } elsif (defined($key)) {
     if ($key == KEY_BACKSPACE) {
