@@ -19,6 +19,8 @@ package KeybindingHandler;
 use strict;
 use warnings;
 
+use Bibman::StatusBar;
+
 sub new {
   my $class = shift;
   my $self = {
@@ -65,9 +67,16 @@ sub handle_keypress {
   my $key_tr = $self->translate_key($c, $key);
   if ((defined($key_tr)) && (defined($self->{bindings}->{$key_tr}))) {
     my $cmdline = $self->{bindings}->{$key_tr};
-    $self->{parent}->enter_command_mode;
-    for my $c (split "", $cmdline) {
-      $self->{parent}->key_pressed($c, undef);
+    # performance optimization -- if the command ends in a newline,
+    # don't type it into the command line, but execute directly
+    if ($cmdline =~ m/\n$/gm) {
+      chomp($cmdline);
+      $self->{parent}->{cmdinterp}->execute($cmdline);
+    } else {
+      $self->{parent}->enter_command_mode;
+      for my $c (split "", $cmdline) {
+        $self->{parent}->key_pressed($c, undef);
+      }
     }
   }
 }
