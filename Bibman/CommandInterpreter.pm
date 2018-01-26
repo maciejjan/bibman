@@ -308,7 +308,7 @@ sub do_open_entry {
 sub do_save {
   my $self = shift;
   my $cmd = shift;
-  if ($#{$cmd->{args}} > 0) {
+  if ($#{$cmd->{args}} > -1) {
     $self->{model}->{filename} = ${$cmd->{args}}[0];
   }
   $self->{model}->write;
