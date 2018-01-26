@@ -49,7 +49,7 @@ sub new {
     filter_pattern => undef
   };
   $self->{cmdinterp} = new CommandInterpreter($self);
-  $self->{kbdhandler} = new KeybindingHandler($self->{cmdinterp});
+  $self->{kbdhandler} = new KeybindingHandler($self);
   bless $self, $class;
 }
 
@@ -93,6 +93,34 @@ sub exit_command_mode {
   $self->draw;
 }
 
+sub key_pressed {
+  my $self = shift;
+  my $c = shift;
+  my $key = shift;
+
+  my $cmd = '';
+  if (defined($key) && ($key == KEY_RESIZE)) {
+    $self->draw;
+  }  else {
+    if ($self->{mode} eq "normal") {
+      if ((defined($c)) && ($c eq ':')) {
+        $self->enter_command_mode;
+      } else {
+        $self->{kbdhandler}->handle_keypress($c, $key);
+      }
+    } elsif ($self->{mode} eq "command") {
+      if (defined($key) && ($key == KEY_BACKSPACE) && (!$self->{cmd_prompt}->{value})) {
+        $self->exit_command_mode;
+      } elsif (defined($c) && ($c eq "\n")) {
+        $self->exit_command_mode;
+        $self->{cmdinterp}->execute($self->{cmd_prompt}->{value});
+      } else {
+        $self->{cmd_prompt}->key_pressed($c, $key);
+      }
+    }
+  }
+}
+
 sub show {
   my $self = shift;
   my $win = shift;
@@ -101,28 +129,7 @@ sub show {
   $self->draw;
 
   while (1) {
-    my ($c, $key) = $win->getchar();
-    my $cmd = '';
-    if (defined($key) && ($key == KEY_RESIZE)) {
-      $self->draw;
-    }  else {
-      if ($self->{mode} eq "normal") {
-        if ((defined($c)) && ($c eq ':')) {
-          $self->enter_command_mode;
-        } else {
-          $self->{kbdhandler}->handle_keypress($c, $key);
-        }
-      } elsif ($self->{mode} eq "command") {
-        if (defined($key) && ($key == KEY_BACKSPACE) && (!$self->{cmd_prompt}->{value})) {
-          $self->exit_command_mode;
-        } elsif (defined($c) && ($c eq "\n")) {
-          $self->exit_command_mode;
-          $self->{cmdinterp}->execute($self->{cmd_prompt}->{value});
-        } else {
-          $self->{cmd_prompt}->key_pressed($c, $key);
-        }
-      }
-    }
+    $self->key_pressed($win->getchar());
   }
 }
 

@@ -22,26 +22,27 @@ use warnings;
 sub new {
   my $class = shift;
   my $self = {
-    cmdinterp => shift,
+    parent => shift,
     bindings => {
-      "a"    => "add",
-      "d"    => "delete",
-      "e"    => "edit",
-      "g"    => "go-to-first",
-      "G"    => "go-to-last",
-      "j"    => "go-down",
-      "k"    => "go-up",
-      "n"    => "search-next",
-      "N"    => "search-prev",
-      "o"    => "open-entry",
-      "s"    => "save",
-      "u"    => "undo",
-      "q"    => "quit",
-      "+"    => "move-down",
-      "-"    => "move-up",
-      "/"    => "search",
-      "?"    => "backward-search",
-      "<CR>" => "open-entry"
+      "a"    => "add\n",
+      "d"    => "delete\n",
+      "e"    => "edit\n",
+      "f"    => "filter ",
+      "g"    => "go-to-first\n",
+      "G"    => "go-to-last\n",
+      "j"    => "go-down\n",
+      "k"    => "go-up\n",
+      "n"    => "search-next\n",
+      "N"    => "search-prev\n",
+      "o"    => "open-entry\n",
+      "s"    => "save\n",
+      "u"    => "undo\n",
+      "q"    => "quit\n",
+      "+"    => "move-down\n",
+      "-"    => "move-up\n",
+      "/"    => "search ",
+      "?"    => "backward-search ",
+      "<CR>" => "open-entry\n"
     }
   };
   bless $self, $class;
@@ -63,7 +64,10 @@ sub handle_keypress {
   my $key_tr = $self->translate_key($c, $key);
   if ((defined($key_tr)) && (defined($self->{bindings}->{$key_tr}))) {
     my $cmdline = $self->{bindings}->{$key_tr};
-    $self->{cmdinterp}->execute($cmdline);
+    $self->{parent}->enter_command_mode;
+    for my $c (split "", $cmdline) {
+      $self->{parent}->key_pressed($c, undef);
+    }
   }
 }
 
