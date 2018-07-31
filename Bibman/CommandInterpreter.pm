@@ -301,7 +301,7 @@ sub do_open_entry {
   my $key = $cmd->{hl_entry}->key;
   my $filename =  "$dir/$key.pdf";
   if (-e $filename) {
-    system "xdg-open $filename";
+    system "xdg-open $filename &";
   }
 }
 
