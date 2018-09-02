@@ -112,7 +112,6 @@ sub key_pressed {
 
   if (defined($c)) {
     if ($c eq "\t") {
-#      $self->{value} .= "<TAB>";
       $self->autocomplete_next;
     } else {
       substr($self->{value}, $self->{pos}, 0) = $c;
