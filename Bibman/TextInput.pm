@@ -29,7 +29,7 @@ sub new {
     value => $value,
     pos => 0,
     left => 0,
-    autocomplete => undef
+    autocompleter => undef
   };
   bless $self, $class;
 }
@@ -112,11 +112,12 @@ sub key_pressed {
 
   if (defined($c)) {
     if ($c eq "\t") {
+#      $self->{value} .= "<TAB>";
       $self->autocomplete_next;
     } else {
       substr($self->{value}, $self->{pos}, 0) = $c;
       $self->{pos}++;
-#        $self->{autocompleter}->reset;
+      $self->{autocompleter}->reset if ($self->{autocompleter});
     }
   } elsif (defined($key)) {
     if ($key == KEY_BACKSPACE) {
@@ -128,6 +129,7 @@ sub key_pressed {
         }
         $self->{pos}--;
       }
+      $self->{autocompleter}->reset if ($self->{autocompleter});
     }
     elsif ($key == KEY_DC) {
       if ($self->{pos} < length $self->{value}) {
@@ -145,9 +147,15 @@ sub key_pressed {
       $self->{pos} = 0;
     }
     elsif ($key == KEY_LEFT) {
-      if ($self->{pos} > 0) { $self->{pos}--; }
+      if ($self->{pos} > 0) {
+        $self->{pos}--;
+        $self->{autocompleter}->reset if ($self->{autocompleter});
+      }
     } elsif ($key == KEY_RIGHT) {
-      if ($self->{pos} < length $self->{value}) { $self->{pos}++; }
+      if ($self->{pos} < length $self->{value}) {
+        $self->{pos}++;
+        $self->{autocompleter}->reset if ($self->{autocompleter});
+      }
     }
   }
   $self->redraw;
