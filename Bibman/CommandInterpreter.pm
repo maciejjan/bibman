@@ -1,5 +1,5 @@
 # This file is part of Bibman -- a console tool for managing BibTeX files.
-# Copyright 2017, Maciej Sumalvico <macjan@o2.pl>
+# Copyright 2017-2018, Maciej Sumalvico <macjan@o2.pl>
 
 # Bibman is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -87,6 +87,8 @@ sub execute {
     if (($result) && (defined($self->{commands}->{$cmd->{name}}->{undo}))) {
       $self->add_to_undo_list($cmd);
     }
+  } else {
+    $self->{mainscr}->{status}->set("Unknown command: $cmd->{name}", StatusBar::ERROR);
   }
 }
 

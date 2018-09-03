@@ -1,0 +1,9 @@
+0.2-alpha
+- undo
+- autocompletion of commands and bibliography fields (currently: entry type and author)
+
+0.1-alpha (initial release)
+- displaying a list of bibliography entries
+- navigating
+- add/edit screen
+- searching and filtering

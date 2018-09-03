@@ -53,6 +53,6 @@ The software is in alpha stage and might be unstable. Please backup all bibliogr
 
 # Author
 
-Maciej Sumalvico <macjan_REMOVE_THIS_PART_@o2.pl>, 2017
+Maciej Sumalvico <macjan_REMOVE_THIS_PART_@o2.pl>, 2017-2018
 
 Feel free to contact me if you have any requests for features or other suggestions.

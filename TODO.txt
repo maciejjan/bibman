@@ -1,17 +1,17 @@
 TODO
 
-v. 0.2 alpha:
+v. 0.3 alpha:
 - sorting entries (by one of the columns)
 - help screen, keybinding cheat-sheets
 - more helpful status messages (e.g. errors)
-- undo option
-  - a queue of operations: "add", "edit", "delete" with previous states of the entries
-    ("add": undef, "edit"/"delete": previous properties)
-- autocompletion of commands and file names
-  - (in TextInput)
-  - also values (words in titles, author names etc.)
+- autocompletion of file names
+- command line history
+- supporting more key combinations in the text inputs
+  (e.g. C-h for backspace, C-w for deleting the last word etc.)
 
 further features:
+- configurable colors
+- configuration files
 - optional and required fields
 - do not allow duplicate keys?
 - selecting multiple entries

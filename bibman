@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 # This file is part of Bibman -- a console tool for managing BibTeX files.
-# Copyright 2017, Maciej Sumalvico <macjan@o2.pl>
+# Copyright 2017-2018, Maciej Sumalvico <macjan@o2.pl>
 
 # Bibman is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -132,6 +132,7 @@ The commands and keybindings are listed below.
  a, :add                add new entry
  e, :edit               edit entry
  d, :delete             delete entry
+ u, :undo               undo last operation
  -, :move-up            move entry up
  +, :move-down          move entry down
 
@@ -157,6 +158,10 @@ The commands and keybindings are listed below.
  <Enter>           toggle editing the field
  q                 save changes and quit the edit screen
 
+=head2 Text input mode
+
+ <Tab>             trigger autocompletion
+
 
 =head1 SEARCHING AND FILTERING
 
@@ -179,6 +184,13 @@ the following command will show only entries published between 2010 and 2015:
 
 In order to clear the filtering and show all entries, execute the "filter"
 command without any arguments.
+
+
+=head1 AUTOCOMPLETION
+
+While editing certain text fields, the <Tab> key triggers autocompletion.
+Currently, this functionality is implemented for the command line, entry types
+and author names.
  
 
 =head1 LICENSE
@@ -198,6 +210,6 @@ along with Bibman. If not, see <http://www.gnu.org/licenses/>.
 
 =head1 BUGS
 
-Please report bugs to: <http://github.com/maciejsum/bibman>
+Please report bugs to: <http://gitlab.com/mmj/bibman>
 
 =cut
