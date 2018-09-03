@@ -38,7 +38,9 @@ Here are some basic keybindings:
 * **\<Home\>**/**g** move to the beginning of the list,
 * **\<End\>**/**G** move to the end of the list,
 * **\<Enter\>** open the pdf file if present; the file must be placed in the same directory as the bibliography file and named `KEY.pdf`, where `KEY` is the entry key; currentrly requires the `rifle` command
+* **a** add a new entry,
 * **e** edit the current entry,
+* **u** undo the last operation,
 * **s**:save the current file,
 * **:** show the command line,
 * **q** quit application.
