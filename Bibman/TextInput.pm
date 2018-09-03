@@ -28,7 +28,8 @@ sub new {
   my $self = {
     value => $value,
     pos => 0,
-    left => 0
+    left => 0,
+    autocompleter => undef
   };
   bless $self, $class;
 }
@@ -88,26 +89,54 @@ sub go_to_last {
   $self->redraw;
 }
 
+sub autocomplete_next {
+  my $self = shift;
+  if (!defined($self->{autocompleter})) { return; }
+  my $idx = rindex($self->{value}, " ", $self->{pos});
+#   if ($idx == -1) { $idx = 0; }
+  if (!defined($self->{autocompleter}->{query})) {
+    my $query = substr($self->{value}, $idx+1, $self->{pos}-$idx);
+    $self->{autocompleter}->start($query);
+  }
+  my $suggestion = $self->{autocompleter}->next;
+  $self->{value} = substr($self->{value}, 0, $idx+1) . $suggestion
+                   . substr($self->{value}, $self->{pos});
+  $self->{pos} = $idx + 1 + length $suggestion;
+  $self->redraw;
+}
+
 sub key_pressed {
   my $self = shift;
   my $c = shift;
   my $key = shift;
 
   if (defined($c)) {
-    substr($self->{value}, $self->{pos}, 0) = $c;
-    $self->{pos}++;
+    if ($c eq "\t") {
+      $self->autocomplete_next;
+    } else {
+      substr($self->{value}, $self->{pos}, 0) = $c;
+      $self->{pos}++;
+      $self->{autocompleter}->reset if ($self->{autocompleter});
+    }
   } elsif (defined($key)) {
     if ($key == KEY_BACKSPACE) {
       if ($self->{pos} > 0) {
         $self->{value} = substr($self->{value}, 0, $self->{pos}-1)
                          . substr($self->{value}, $self->{pos});
+        if (!defined($self->{value})) {
+          $self->{value} = "";
+        }
         $self->{pos}--;
       }
+      $self->{autocompleter}->reset if ($self->{autocompleter});
     }
     elsif ($key == KEY_DC) {
       if ($self->{pos} < length $self->{value}) {
         $self->{value} = substr($self->{value}, 0, $self->{pos})
                          . substr($self->{value}, $self->{pos}+1);
+        if (!defined($self->{value})) {
+          $self->{value} = "";
+        }
       }
     }
     elsif ($key == KEY_END) {
@@ -117,9 +146,15 @@ sub key_pressed {
       $self->{pos} = 0;
     }
     elsif ($key == KEY_LEFT) {
-      if ($self->{pos} > 0) { $self->{pos}--; }
+      if ($self->{pos} > 0) {
+        $self->{pos}--;
+        $self->{autocompleter}->reset if ($self->{autocompleter});
+      }
     } elsif ($key == KEY_RIGHT) {
-      if ($self->{pos} < length $self->{value}) { $self->{pos}++; }
+      if ($self->{pos} < length $self->{value}) {
+        $self->{pos}++;
+        $self->{autocompleter}->reset if ($self->{autocompleter});
+      }
     }
   }
   $self->redraw;

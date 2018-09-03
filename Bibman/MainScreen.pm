@@ -30,6 +30,7 @@ use Bibman::EditScreen;
 use Bibman::KeybindingHandler;
 use Bibman::TabularList;
 use Bibman::TextInput;
+use Bibman::TrieAutocompleter;
 use Bibman::StatusBar;
 
 sub new {
@@ -50,6 +51,10 @@ sub new {
   };
   $self->{cmdinterp} = new CommandInterpreter($self);
   $self->{kbdhandler} = new KeybindingHandler($self);
+  $self->{cmd_prompt}->{autocompleter} = new TrieAutocompleter();
+  for my $cmd (keys %{$self->{cmdinterp}->{commands}}) {
+    $self->{cmd_prompt}->{autocompleter}->add($cmd);
+  }
   bless $self, $class;
 }
 
