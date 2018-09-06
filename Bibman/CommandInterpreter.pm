@@ -146,6 +146,12 @@ sub do_add {
   my $self = shift;
   my $cmd = shift;
   my $editscr = new EditScreen({ entry_type => "article" });
+  for my $field (@$autocomplete_fields) {
+    if (defined($editscr->{inputs}->{$field})) {
+      $editscr->{inputs}->{$field}->{autocompleter} =
+        $self->{autocompleters}->{$field};
+    }
+  }
   my $properties = $editscr->show($self->{mainscr}->{win});
   $self->{mainscr}->draw;
   my $new_entry = $self->{model}->create_entry($properties);
