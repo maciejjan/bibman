@@ -120,13 +120,13 @@ The commands and keybindings are listed below.
 
 =head2 Navigation
 
- <Up>, k, :go-up          go one entry up
- <Down>, j, :go-down      to one entry down
- <Home>, g, :go-to-first  go to first entry
- <End>, G, :go-to-last    go to last entry
- <Enter>, o, :open-entry  open the pdf file associated with the entry
- z, :center               center the view at the current entry
- q, :quit                 quit bibman (without saving changes)
+ k, :go-up             go one entry up
+ j, :go-down           go one entry down
+ g, :go-to-first       go to first entry
+ G, :go-to-last        go to last entry
+ o, :open-entry        open the pdf file associated with the entry
+ z, :center            center the view at the current entry
+ q, :quit              quit bibman (without saving changes)
 
 =head2 Manipulating entries
 
