@@ -38,6 +38,7 @@ sub new {
     commands => {
       add => { do => \&do_add, undo => \&undo_add },
       'backward-search' => { do => \&do_backward_search },
+      center => { do => \&do_center },
       delete => { do => \&do_delete, undo => \&undo_delete },
       edit => { do => \&do_edit, undo => \&undo_edit },
       filter => { do => \&do_filter },
@@ -183,6 +184,12 @@ sub undo_add {
   $self->{mainscr}->{list}->delete_item($cmd->{hl_idx}+1);
   $self->{mainscr}->{list}->redraw;
   $self->{mainscr}->{list}->go_to_item($cmd->{hl_idx});
+}
+
+sub do_center {
+  my $self = shift;
+  my $cmd = shift;
+  $self->{mainscr}->{list}->center();
 }
 
 sub do_edit {

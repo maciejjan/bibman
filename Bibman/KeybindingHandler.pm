@@ -42,6 +42,7 @@ sub new {
       "S"    => "save ",
       "u"    => "undo\n",
       "q"    => "quit\n",
+      "z"    => "center\n",
       "+"    => "move-down\n",
       "-"    => "move-up\n",
       "/"    => "search ",

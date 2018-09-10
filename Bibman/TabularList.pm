@@ -131,6 +131,14 @@ sub format_item {
   return $formatted_line_str;
 }
 
+sub center {
+  my $self = shift;
+  my $new_top = $self->{highlight} - int($self->{height}/2);
+  if ($new_top < 0) { $new_top = 0; }
+  $self->{top} = $new_top;
+  $self->redraw;
+}
+
 sub go_up {
   my $self = shift;
   $self->go_to_item($self->prev_visible($self->{highlight}-1));
