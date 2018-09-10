@@ -33,11 +33,11 @@ After installation, run the command `bibman MY-BIBLIOGRAPHY-FILE` to open the bi
 
 Here are some basic keybindings:
 
-* **\<up\>**/**k** move one entry up,
-* **\<down\>**/**j** move one entry down,
-* **\<Home\>**/**g** move to the beginning of the list,
-* **\<End\>**/**G** move to the end of the list,
-* **\<Enter\>** open the pdf file if present; the file must be placed in the same directory as the bibliography file and named `KEY.pdf`, where `KEY` is the entry key; by default it runs `xdg-open`, you can override this by setting the environment variable `BIBMAN_VIEWER`
+* **k** move one entry up,
+* **j** move one entry down,
+* **g** move to the beginning of the list,
+* **G** move to the end of the list,
+* **o** open the pdf file if present; the file must be placed in the same directory as the bibliography file and named `KEY.pdf`, where `KEY` is the entry key; by default it runs `xdg-open`, you can override this by setting the environment variable `BIBMAN_VIEWER`
 * **a** add a new entry,
 * **e** edit the current entry,
 * **u** undo the last operation,
