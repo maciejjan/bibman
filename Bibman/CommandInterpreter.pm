@@ -355,7 +355,7 @@ sub do_open_entry {
   }
   if (-e $filename) {
     if (fork == 0) {
-      exec "$viewer $filename &";
+      exec "$viewer $filename";
     }
   } else {
     $self->error("File not found: $filename");
