@@ -18,6 +18,7 @@ package CommandInterpreter;
 
 use strict;
 use warnings;
+use Env;
 use File::Basename;
 
 use Bibman::Bibliography;
@@ -26,6 +27,7 @@ use Bibman::StatusBar;
 use Bibman::TrieAutocompleter;
 
 my $autocomplete_fields = ["entry_type", "author"];
+my $default_viewer = "xdg-open";
 
 sub new {
   my $class = shift;
@@ -88,8 +90,20 @@ sub execute {
       $self->add_to_undo_list($cmd);
     }
   } else {
-    $self->{mainscr}->{status}->set("Unknown command: $cmd->{name}", StatusBar::ERROR);
+    $self->error("Unknown command: $cmd->{name}");
   }
+}
+
+sub error {
+  my $self = shift;
+  my $msg = shift;
+  $self->{mainscr}->{status}->set($msg, StatusBar::ERROR);
+}
+
+sub info {
+  my $self = shift;
+  my $msg = shift;
+  $self->{mainscr}->{status}->set($msg, StatusBar::INFO);
 }
 
 sub format_entry {
@@ -335,8 +349,16 @@ sub do_open_entry {
   my $dir = dirname($self->{model}->{filename});
   my $key = $cmd->{hl_entry}->key;
   my $filename =  "$dir/$key.pdf";
+  my $viewer = $default_viewer;
+  if (defined($ENV{BIBMAN_VIEWER})) {
+    $viewer = $ENV{BIBMAN_VIEWER};
+  }
   if (-e $filename) {
-    system "xdg-open $filename &";
+    if (fork == 0) {
+      exec "$viewer $filename &";
+    }
+  } else {
+    $self->error("File not found: $filename");
   }
 }
 
@@ -347,7 +369,7 @@ sub do_save {
     $self->{model}->{filename} = ${$cmd->{args}}[0];
   }
   $self->{model}->write;
-  $self->{mainscr}->{status}->set("Saved to $self->{model}->{filename}.", StatusBar::INFO);
+  $self->info("Saved to $self->{model}->{filename}.");
 }
 
 sub match {

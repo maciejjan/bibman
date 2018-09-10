@@ -124,7 +124,7 @@ The commands and keybindings are listed below.
  <Down>, j, :go-down      to one entry down
  <Home>, g, :go-to-first  go to first entry
  <End>, G, :go-to-last    go to last entry
- <Enter>, :open-entry     open the pdf file associated with the entry
+ <Enter>, o, :open-entry  open the pdf file associated with the entry
  q, :quit                 quit bibman (without saving changes)
 
 =head2 Manipulating entries
@@ -147,7 +147,7 @@ The commands and keybindings are listed below.
 
 =head2 Input/Output
 
- o, :open [FILENAME]    open a bibliography file
+ O, :open [FILENAME]    open a bibliography file
  s, :save               save the entry to the current file
  S, :save [FILENAME]    save the entry to file FILENAME
 
@@ -191,6 +191,10 @@ command without any arguments.
 While editing certain text fields, the <Tab> key triggers autocompletion.
 Currently, this functionality is implemented for the command line, entry types
 and author names.
+
+=head1 ENVIRONMENT VARIABLES
+
+ BIBMAN_VIEWER        the program used to open pdf files (default: xdg-open)
  
 
 =head1 LICENSE

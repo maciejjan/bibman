@@ -37,6 +37,7 @@ sub new {
       "n"    => "search-next\n",
       "N"    => "search-prev\n",
       "o"    => "open-entry\n",
+      "O"    => "open ",
       "s"    => "save\n",
       "S"    => "save ",
       "u"    => "undo\n",
