@@ -50,6 +50,8 @@ sub new {
       'move-up' => { do => \&do_move_up, undo => \&undo_move_up },
       open => { do => \&do_open },
       'open-entry' => { do => \&do_open_entry },
+      'page-down' => { do => \&do_go_page_down },
+      'page-up' => { do => \&do_go_page_up },
       save => { do => \&do_save },
       search => { do => \&do_search },
       'search-next' => { do => \&do_search_next },
@@ -327,6 +329,18 @@ sub do_go_down {
   my $self = shift;
   my $cmd = shift;
   $self->{mainscr}->{list}->go_down();
+}
+
+sub do_go_page_up {
+  my $self = shift;
+  my $cmd = shift;
+  $self->{mainscr}->{list}->go_page_up();
+}
+
+sub do_go_page_down {
+  my $self = shift;
+  my $cmd = shift;
+  $self->{mainscr}->{list}->go_page_down();
 }
 
 sub do_go_to_first {

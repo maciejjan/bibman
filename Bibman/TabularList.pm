@@ -149,6 +149,34 @@ sub go_down {
   $self->go_to_item($self->next_visible($self->{highlight}+1));
 }
 
+sub go_page_up {
+  my $self = shift;
+  if ($self->{highlight} - $self->{height} < 0) {
+    $self->go_to_first();
+  } else {
+    $self->{highlight} -= $self->{height};
+    my $new_top = $self->{top} - $self->{height};
+    if ($new_top < 0) { $new_top = 0; }
+    $self->{top} = $new_top;
+    $self->redraw;
+  }
+}
+
+sub go_page_down {
+  my $self = shift;
+  if ($self->{highlight} + $self->{height} > $#{$self->{items}}) {
+    $self->go_to_last();
+  } else {
+    $self->{highlight} += $self->{height};
+    my $new_top = $self->{top} + $self->{height};
+    if ($new_top + $self->{height} > $#{$self->{items}}) {
+      $new_top = $#{$self->{items}} - $self->{height};
+    }
+    $self->{top} = $new_top;
+    $self->redraw;
+  }
+}
+
 sub go_to_first {
   my $self = shift;
   $self->go_to_item($self->next_visible(0));
