@@ -49,11 +49,13 @@ sub new {
       'open-entry' => { do => \&do_open_entry },
       'page-down' => { do => \&do_go_page_down },
       'page-up' => { do => \&do_go_page_up },
+      paste => { do => \&do_paste },
       save => { do => \&do_save },
       search => { do => \&do_search },
       'search-next' => { do => \&do_search_next },
       'search-prev' => { do => \&do_search_prev },
       undo => { do => \&do_undo },
+      yank => { do => \&do_yank },
       quit => { do => \&do_quit },
     },
     undo_pos => -1,
@@ -499,6 +501,39 @@ sub do_undo {
   $self->{commands}->{$cmd->{name}}->{undo}->($self, $cmd);
   $self->{undo_pos}--;
   return 1;
+}
+
+sub do_yank {
+  my $self = shift;
+  my $cmd = shift;
+  if (open(my $pipe, "|-:encoding(UTF-8)", "xclip -i")) {
+    print $pipe $cmd->{hl_entry}->print_s();
+    close($pipe);
+    my $key = Bibliography::get_property($cmd->{hl_entry}, "key");
+    $self->info("Copied $key to primary selection.");
+  } else {
+    $self->error("Could not pipe to xclip.");
+  }
+}
+
+sub do_paste {
+  my $self = shift;
+  my $cmd = shift;
+  if (my $entry_text = `xclip -o`) {
+    my $new_entry = Text::BibTeX::Entry->new();
+    $new_entry->parse_s($entry_text);
+    if ($new_entry->parse_ok) {
+      $self->{model}->add_entry_at($cmd->{hl_idx}+1, $new_entry);
+      $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}+1, format_entry($new_entry));
+      $self->{mainscr}->{list}->redraw;
+      $self->{mainscr}->{list}->go_down;
+    }
+    else {
+      $self->error("Clipboard does not contain a valid BibTeX entry.");
+    }
+  } else {
+    $self->error("Could not pipe from xclip.");
+  }
 }
 
 sub do_quit {
