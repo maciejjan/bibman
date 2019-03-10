@@ -1,0 +1,16 @@
+LICENSE
+screenshot.png
+MANIFEST
+bin/bibman
+Makefile.PL
+README.md
+CHANGES
+TODO.txt
+lib/Bibman/Bibliography.pm
+lib/Bibman/KeybindingHandler.pm
+lib/Bibman/TabularList.pm
+lib/Bibman/MainScreen.pm
+lib/Bibman/TextInput.pm
+lib/Bibman/StatusBar.pm
+lib/Bibman/CommandInterpreter.pm
+lib/Bibman/EditScreen.pm

@@ -28,7 +28,7 @@ use lib "$Bin/.";
 use Bibman::MainScreen;
 use Bibman::StatusBar;
 
-use constant VERSION => "0.2.1-alpha";
+use constant VERSION => "0.2.2-alpha";
 
 my $INPUT_FILE;
 my $arg = shift @ARGV;
@@ -37,9 +37,7 @@ while (defined($arg)) {
     print_help();
   } elsif (($arg eq "-v") || ($arg eq "--version")) {
     print_version();
-  } elsif ($arg eq "--man") {
-    print_manpage();
-  } else {
+   else {
     $INPUT_FILE = $arg;
     last;
   }
@@ -105,7 +103,6 @@ bibman [options] FILE
 
  -h, --help                print help and exit
  -v, --version             print version information and exit
- --man                     print the manual page and exit
 
 =head1 DESCRIPTION
 
