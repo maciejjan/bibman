@@ -8,6 +8,7 @@ v. 0.3 alpha:
 - command line history
 - supporting more key combinations in the text inputs
   (e.g. C-h for backspace, C-w for deleting the last word etc.)
+  -> EMACS bindings
 
 further features:
 - configurable colors
