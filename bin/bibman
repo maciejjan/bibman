@@ -116,6 +116,8 @@ The commands and keybindings are listed below.
 
  k, :go-up             go one entry up
  j, :go-down           go one entry down
+ K, :page-up           go one page up
+ J, :page-down         go one page down
  g, :go-to-first       go to first entry
  G, :go-to-last        go to last entry
  o, :open-entry        open the pdf file associated with the entry
@@ -124,17 +126,20 @@ The commands and keybindings are listed below.
 
 =head2 Manipulating entries
 
- a, :add                add new entry
- e, :edit               edit entry
- d, :delete             delete entry
- u, :undo               undo last operation
- -, :move-up            move entry up
- +, :move-down          move entry down
+ a, :add            add new entry
+ e, :edit           edit entry
+ d, :delete         delete entry
+ p, :paste          paste an entry from X primary selection (requires xclip)
+ u, :undo           undo last operation
+ y, :yank           copy current entry to X primary selection (requires xclip)
+ -, :move-up        move entry up
+ +, :move-down      move entry down
 
 =head2 Searching and filtering
 
  /, :search [PATTERN]          search for PATTERN in the visible columns of the list
  /, :search [FIELD] [PATTERN]  search for PATTERN in FIELD
+ ?, :backward-search           like :search, but backwards
  n, :search-next               jump to the next search result
  N, :search-prev               jump to the previous search result
  f, :filter [PATTERN]          show only list items matching PATTERN
@@ -156,7 +161,6 @@ The commands and keybindings are listed below.
 =head2 Text input mode
 
  <Tab>             trigger autocompletion
-
 
 =head1 SEARCHING AND FILTERING
 
@@ -184,8 +188,8 @@ command without any arguments.
 =head1 AUTOCOMPLETION
 
 While editing certain text fields, the <Tab> key triggers autocompletion.
-Currently, this functionality is implemented for the command line, entry types
-and author names.
+Currently, this functionality is implemented for entry types and the following
+fields: I<author>, I<journal> and I<booktitle>.
 
 =head1 ENVIRONMENT VARIABLES
 
