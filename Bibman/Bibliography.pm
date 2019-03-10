@@ -118,13 +118,8 @@ sub add_entry {
 sub add_entry_at {
   my $self = shift;
   my $idx = shift;
-#   my $type = shift;
-#   my $entry = Text::BibTeX::Entry->new();
   my $entry = shift;
-#   $entry->set_metatype(Text::BibTeX::BTE_REGULAR);
-#   $entry->set_type($type);
   splice @{$self->{entries}}, $idx, 0, $entry;
-#   return $entry;
 }
 
 sub delete_entry {
