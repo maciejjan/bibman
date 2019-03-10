@@ -189,7 +189,7 @@ and author names.
 
 =head1 ENVIRONMENT VARIABLES
 
- BIBMAN_VIEWER        the program used to open pdf files (default: xdg-open)
+ READER        the program used to open pdf files (default: xdg-open)
  
 
 =head1 LICENSE

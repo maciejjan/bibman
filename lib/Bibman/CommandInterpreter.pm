@@ -25,7 +25,7 @@ use Bibman::Bibliography;
 use Bibman::EditScreen;
 use Bibman::StatusBar;
 
-my $default_viewer = "xdg-open";
+my $default_reader = "xdg-open";
 
 sub new {
   my $class = shift;
@@ -342,13 +342,13 @@ sub do_open_entry {
   my $dir = dirname($self->{model}->{filename});
   my $key = $cmd->{hl_entry}->key;
   my $filename =  "$dir/$key.pdf";
-  my $viewer = $default_viewer;
-  if (defined($ENV{BIBMAN_VIEWER})) {
-    $viewer = $ENV{BIBMAN_VIEWER};
+  my $reader = $default_reader;
+  if (defined($ENV{READER})) {
+    $reader = $ENV{READER};
   }
   if (-e $filename) {
     if (fork == 0) {
-      exec "$viewer $filename";
+      exec "$reader $filename";
     }
   } else {
     $self->error("File not found: $filename");
