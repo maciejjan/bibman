@@ -59,7 +59,7 @@ bibliography files you're working with.
 
 # Author
 
-Maciej Sumalvico (macjan_REMOVE_THIS_PART_@o2.pl), 2017-2018
+Maciej Sumalvico <macjan@o2.pl>, 2017-2019
 
 Feel free to contact me if you have any requests for features or other
 suggestions.

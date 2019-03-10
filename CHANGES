@@ -1,6 +1,19 @@
+0.3.0-alpha
+- installing with Makefile.PL
+- yank/paste to/from xclip
+- simplified the autocompletion implementation and added autocompletion for
+  further fields
+- scroll page up/down
+
+0.2.1-alpha
+- configuring the pdf viewer via an environment variable
+- command for centering the view at the highlighted entry
+- some bugfixes
+
 0.2-alpha
 - undo
-- autocompletion of commands and bibliography fields (currently: entry type and author)
+- autocompletion of commands and bibliography fields (currently: entry type and
+  author)
 
 0.1-alpha (initial release)
 - displaying a list of bibliography entries
