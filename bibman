@@ -54,6 +54,12 @@ if (!defined($INPUT_FILE)) {
   print_help();
 }
 
+# disable printing STDERR to the terminal (doesn't play well with curses)
+if (-t STDERR) {
+  use File::Spec;
+  open STDERR, '>', File::Spec->devnull() or die "could not open STDERR: $!\n";
+}
+
 my $win = new Curses;
 initscr;
 raw;
