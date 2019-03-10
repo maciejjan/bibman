@@ -20,10 +20,7 @@ use strict;
 use warnings;
 use feature 'unicode_strings';
 use Curses;
-use Pod::Man;
 use Pod::Usage;
-use FindBin qw($Bin);
-use lib "$Bin/.";
 
 use Bibman::MainScreen;
 use Bibman::StatusBar;
@@ -37,7 +34,7 @@ while (defined($arg)) {
     print_help();
   } elsif (($arg eq "-v") || ($arg eq "--version")) {
     print_version();
-   else {
+  } else {
     $INPUT_FILE = $arg;
     last;
   }
@@ -82,12 +79,6 @@ sub print_help {
 
 sub print_version {
   print "bibman " . VERSION . "\n";
-  exit 0;
-}
-
-sub print_manpage {
-  my $parser = Pod::Man->new(release => VERSION, section => 1);
-  $parser->parse_file($0);
   exit 0;
 }
 

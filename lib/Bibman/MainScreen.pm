@@ -21,8 +21,6 @@ use warnings;
 use feature 'unicode_strings';
 use Curses;
 use File::Basename;
-use FindBin qw($Bin);
-use lib "$Bin/.";
 
 use Bibman::Bibliography;
 use Bibman::CommandInterpreter;
