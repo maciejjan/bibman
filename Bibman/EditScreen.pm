@@ -26,6 +26,8 @@ use Bibman::Bibliography;
 use Bibman::StatusBar;
 use Bibman::TextInput;
 
+my $autocomplete_fields = ["author", "booktitle", "journal"];
+
 sub new {
   my $class = shift;
   my $self = {
@@ -35,6 +37,7 @@ sub new {
     inputs => undef,
     height => undef,
     left_col_width => undef,
+    model => undef,
     status => new StatusBar(),
     highlight => 0,
     top => 0
@@ -42,6 +45,22 @@ sub new {
   $self->{fields} = Bibliography::get_fields_for_type($self->{properties}->{entry_type});
   reset_inputs($self);
   bless $self, $class;
+}
+
+sub init_completion {
+  my $self = shift;
+  my $model = shift;
+
+  $self->{model} = $model;
+  # autocompletion
+  $self->{inputs}->{entry_type}->{completion}->{get_suggestions} =
+    Bibliography::entry_type_completer();
+  for my $field (@$autocomplete_fields) {
+    if (defined($self->{inputs}->{$field})) {
+      $self->{inputs}->{$field}->{completion}->{get_suggestions} =
+        $model->field_completer($field);
+    }
+  }
 }
 
 sub reset_inputs {
@@ -106,6 +125,9 @@ sub change_type {
   $self->{fields} = Bibliography::get_fields_for_type($new_type);
   $self->{properties}->{entry_type} = $new_type;
   $self->reset_inputs;
+  if (defined($self->{model})) {
+    $self->init_completion($self->{model});
+  }
 }
 
 sub go_up {
@@ -158,6 +180,9 @@ sub show {
             $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
           }
           $self->{inputs}->{$focus}->go_to_first;
+          if (defined($self->{inputs}->{$focus}->{completion})) {
+            $self->{inputs}->{$focus}->reset_completion;
+          }
           $self->{focus} = undef;
           curs_set(0);
         } elsif (defined($key) && ($key eq KEY_EXIT)) {

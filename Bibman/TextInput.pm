@@ -29,7 +29,7 @@ sub new {
     value => $value,
     pos => 0,
     left => 0,
-    autocompleter => undef
+    completion => undef
   };
   bless $self, $class;
 }
@@ -89,19 +89,43 @@ sub go_to_last {
   $self->redraw;
 }
 
-sub autocomplete_next {
+sub start_completion {
   my $self = shift;
-  if (!defined($self->{autocompleter})) { return; }
+  my $query = shift;
+  if (!defined($self->{completion})) { return; }
+  $self->{completion}->{suggestions} =
+    $self->{completion}->{get_suggestions}->($query);
+  $self->{completion}->{current} = 0;
+}
+
+sub reset_completion {
+  my $self = shift;
+  if (!defined($self->{completion})) { return; }
+  undef $self->{completion}->{suggestions};
+  undef $self->{completion}->{current};
+}
+
+sub complete_next {
+  my $self = shift;
+
+  if (!defined($self->{completion})) { return; }
+
   my $idx = rindex($self->{value}, " ", $self->{pos});
-#   if ($idx == -1) { $idx = 0; }
-  if (!defined($self->{autocompleter}->{query})) {
+  # start completion if not already started
+  if (!defined($self->{completion}->{suggestions})) {
     my $query = substr($self->{value}, $idx+1, $self->{pos}-$idx);
-    $self->{autocompleter}->start($query);
+    $self->start_completion($query);
   }
-  my $suggestion = $self->{autocompleter}->next;
-  $self->{value} = substr($self->{value}, 0, $idx+1) . $suggestion
+  # get the current suggestion and set the `current` index to the next one
+  my @suggestions = @{$self->{completion}->{suggestions}};
+  my $s = $suggestions[$self->{completion}->{current}++];
+  if ($self->{completion}->{current} > $#suggestions) {
+    $self->{completion}->{current} = 0;
+  }
+  # insert the suggestion into the text field value
+  $self->{value} = substr($self->{value}, 0, $idx+1) . $s
                    . substr($self->{value}, $self->{pos});
-  $self->{pos} = $idx + 1 + length $suggestion;
+  $self->{pos} = $idx + 1 + length $s;
   $self->redraw;
 }
 
@@ -112,11 +136,12 @@ sub key_pressed {
 
   if (defined($c)) {
     if ($c eq "\t") {
-      $self->autocomplete_next;
+      $self->complete_next;
+      1;
     } else {
       substr($self->{value}, $self->{pos}, 0) = $c;
       $self->{pos}++;
-      $self->{autocompleter}->reset if ($self->{autocompleter});
+      $self->reset_completion;
     }
   } elsif (defined($key)) {
     if ($key == KEY_BACKSPACE) {
@@ -128,7 +153,7 @@ sub key_pressed {
         }
         $self->{pos}--;
       }
-      $self->{autocompleter}->reset if ($self->{autocompleter});
+      $self->reset_completion;
     }
     elsif ($key == KEY_DC) {
       if ($self->{pos} < length $self->{value}) {
@@ -148,12 +173,12 @@ sub key_pressed {
     elsif ($key == KEY_LEFT) {
       if ($self->{pos} > 0) {
         $self->{pos}--;
-        $self->{autocompleter}->reset if ($self->{autocompleter});
+        $self->reset_completion;
       }
     } elsif ($key == KEY_RIGHT) {
       if ($self->{pos} < length $self->{value}) {
         $self->{pos}++;
-        $self->{autocompleter}->reset if ($self->{autocompleter});
+        $self->reset_completion;
       }
     }
   }

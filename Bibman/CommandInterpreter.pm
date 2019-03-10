@@ -24,15 +24,12 @@ use File::Basename;
 use Bibman::Bibliography;
 use Bibman::EditScreen;
 use Bibman::StatusBar;
-use Bibman::TrieAutocompleter;
 
-my $autocomplete_fields = ["entry_type", "author"];
 my $default_viewer = "xdg-open";
 
 sub new {
   my $class = shift;
   my $self = {
-    autocompleters => {},
     model => new Bibliography(),
     mainscr => shift,
     commands => {
@@ -123,22 +120,6 @@ sub format_entry {
   return \@list_entry;
 }
 
-sub make_autocompleters {
-  my $self = shift;
-  $self->{autocompleters} = {};
-  for my $field (@$autocomplete_fields) {
-    $self->{autocompleters}->{$field} = new TrieAutocompleter();
-  }
-  for my $entry (@{$self->{model}->{entries}}) {
-    for my $field (@$autocomplete_fields) {
-      my @values = split /\s/, Bibliography::get_property($entry, $field);
-      for my $value (@values) {
-        $self->{autocompleters}->{$field}->add($value);
-      }
-    }
-  }
-}
-
 sub update_view {
   my $self = shift;
   my $list = $self->{mainscr}->{list};
@@ -163,12 +144,7 @@ sub do_add {
   my $self = shift;
   my $cmd = shift;
   my $editscr = new EditScreen({ entry_type => "article" });
-  for my $field (@$autocomplete_fields) {
-    if (defined($editscr->{inputs}->{$field})) {
-      $editscr->{inputs}->{$field}->{autocompleter} =
-        $self->{autocompleters}->{$field};
-    }
-  }
+  $editscr->init_completion($self->{model});
   my $properties = $editscr->show($self->{mainscr}->{win});
   $self->{mainscr}->draw;
   my $new_entry = $self->{model}->create_entry($properties);
@@ -198,12 +174,7 @@ sub do_edit {
   my $self = shift;
   my $cmd = shift;
   my $editscr = new EditScreen(Bibliography::get_properties($cmd->{hl_entry}));
-  for my $field (@$autocomplete_fields) {
-    if (defined($editscr->{inputs}->{$field})) {
-      $editscr->{inputs}->{$field}->{autocompleter} =
-        $self->{autocompleters}->{$field};
-    }
-  }
+  $editscr->init_completion($self->{model});
   my $properties = $editscr->show($self->{mainscr}->{win});
   my $old_properties = Bibliography::get_properties($cmd->{hl_entry});
   $self->{mainscr}->draw;
@@ -359,7 +330,6 @@ sub do_open {
   my $self = shift;
   my $cmd = shift;
   $self->{model} = new Bibliography($cmd->{args}[0]);
-  $self->make_autocompleters();
   $self->update_view();
   return 1;
 }

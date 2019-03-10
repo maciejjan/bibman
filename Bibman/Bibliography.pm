@@ -36,6 +36,7 @@ my $fields = {
   techreport => ["address", "author", "institution", "month", "note", "number", "title", "type", "year"],
   unpublished => ["author", "month", "note", "title", "year"]
 };
+my @field_names = sort keys %{$fields};
 
 sub new {
   my $class = shift;
@@ -220,6 +221,40 @@ sub format_authors {
 	} else {
 		return "unknown";
 	}
+}
+
+sub entry_type_completer {
+  return sub {
+    my $query = shift;
+    my @results = ();
+    for my $fn (@field_names) {
+      if ($fn =~ m/(^| )($query\w*)/) {
+        push @results, $2;
+      }
+    }
+    push @results, $query;
+    return \@results;
+  }
+}
+
+sub field_completer {
+  my $self = shift;
+  my $field = shift;
+  return sub {
+    my $query = shift;
+    my @results = ();
+    for my $entry (@{$self->{entries}}) {
+      my $prop = get_property($entry, $field);
+      if (defined($prop) && $prop =~ m/(^| )($query\w*)/) {
+        push @results, $2;
+      }
+    }
+    # unique sort of the results
+    my %hash = map { $_, 1 } @results;
+    my @results_sorted = sort keys %hash;
+    push @results_sorted, $query;
+    return \@results_sorted;
+  }
 }
 
 1;
