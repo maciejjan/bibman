@@ -167,6 +167,7 @@ The commands and keybindings are listed below.
  <Del>, ^D         delete the character under the cursor
  <Backspace>, ^H   delete the character before the cursor
  <Tab>, ^I         trigger autocompletion
+ <Esc>, ^G         cancel input
  ^K                delete from the cursor to the end of the line
  ^U                delete from the cursor to the beginning of the line
  ^W                delete a word before the cursor

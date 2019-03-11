@@ -108,11 +108,15 @@ sub key_pressed {
     } elsif ($self->{mode} eq "command") {
       if (defined($key) && ($key == KEY_BACKSPACE) && (!$self->{cmd_prompt}->{value})) {
         $self->exit_command_mode;
-      } elsif (defined($c) && ($c eq "\n")) {
-        $self->exit_command_mode;
-        $self->{cmdinterp}->execute($self->{cmd_prompt}->{value});
-      } else {
-        $self->{cmd_prompt}->key_pressed($c, $key);
+      } elsif (defined($c)) {
+        if ($c eq "\n") {
+          $self->exit_command_mode;
+          $self->{cmdinterp}->execute($self->{cmd_prompt}->{value});
+        } elsif ((ord($c) == 7) || (ord($c) == 27)) {     # Esc or ^G
+          $self->exit_command_mode;
+        } else {
+          $self->{cmd_prompt}->key_pressed($c, $key);
+        }
       }
     }
   }

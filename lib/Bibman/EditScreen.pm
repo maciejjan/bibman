@@ -166,31 +166,39 @@ sub show {
     } else {
       my $focus = $self->{focus};
       if (defined($focus)) {
-        if (defined($c) && ($c eq "\n")) {
-          if ($focus eq "entry_type") {
-            my $new_type = $self->{inputs}->{$focus}->{value};
-            if (Bibliography::has_type($new_type)) {
-              $self->change_type($new_type);
-              $self->draw;
+        if (defined($c)) {
+          if ($c eq "\n") {
+            if ($focus eq "entry_type") {
+              my $new_type = $self->{inputs}->{$focus}->{value};
+              if (Bibliography::has_type($new_type)) {
+                $self->change_type($new_type);
+                $self->draw;
+              } else {
+                $self->{status}->set("Unknown type: $new_type", StatusBar::ERROR);
+                $self->{inputs}->{$focus}->set_value($self->{properties}->{entry_type});
+              }
             } else {
-              $self->{status}->set("Unknown type: $new_type", StatusBar::ERROR);
-              $self->{inputs}->{$focus}->set_value($self->{properties}->{entry_type});
+              $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
             }
+            $self->{inputs}->{$focus}->go_to_first;
+            if (defined($self->{inputs}->{$focus}->{completion})) {
+              $self->{inputs}->{$focus}->reset_completion;
+            }
+            $self->{focus} = undef;
+            curs_set(0);
+          } elsif ((ord($c) == 7) || (ord($c) == 27)) {     # Esc or ^G
+            $self->{inputs}->{$focus}->{value} = $self->{properties}->{$focus};
+            $self->{inputs}->{$focus}->go_to_first;
+            $self->{inputs}->{$focus}->redraw;
+            $self->{focus} = undef;
+            curs_set(0);
+          } elsif (defined($key) && ($key eq KEY_EXIT)) {
+            $self->{focus} = undef;
+            curs_set(0);
           } else {
-            $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
+            $self->{inputs}->{$self->{focus}}->key_pressed($c, $key);
           }
-          $self->{inputs}->{$focus}->go_to_first;
-          if (defined($self->{inputs}->{$focus}->{completion})) {
-            $self->{inputs}->{$focus}->reset_completion;
-          }
-          $self->{focus} = undef;
-          curs_set(0);
-        } elsif (defined($key) && ($key eq KEY_EXIT)) {
-          $self->{focus} = undef;
-          curs_set(0);
-        } else {
-          $self->{inputs}->{$self->{focus}}->key_pressed($c, $key);
-        }
+        } 
       } else {
         if (defined($c)) {
           if ($c eq 'k') {
