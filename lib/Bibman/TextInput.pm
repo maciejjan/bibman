@@ -77,16 +77,87 @@ sub correct_left {
   }
 }
 
+sub go_left {
+  my $self = shift;
+  if ($self->{pos} > 0) {
+    $self->{pos}--;
+    $self->reset_completion;
+  }
+}
+
+sub go_right {
+  my $self = shift;
+  if ($self->{pos} < length $self->{value}) {
+    $self->{pos}++;
+    $self->reset_completion;
+  }
+}
+
 sub go_to_first {
   my $self = shift;
   $self->{pos} = 0;
-  $self->redraw;
 }
 
 sub go_to_last {
   my $self = shift;
   $self->{pos} = length $self->{value};
-  $self->redraw;
+}
+
+sub backspace {
+  my $self = shift;
+  if ($self->{pos} > 0) {
+    $self->{value} = substr($self->{value}, 0, $self->{pos}-1)
+                     . substr($self->{value}, $self->{pos});
+    if (!defined($self->{value})) {
+      $self->{value} = "";
+    }
+    $self->{pos}--;
+  }
+  $self->reset_completion;
+}
+
+sub delete_char {
+  my $self = shift;
+  if ($self->{pos} < length $self->{value}) {
+    $self->{value} = substr($self->{value}, 0, $self->{pos})
+                     . substr($self->{value}, $self->{pos}+1);
+    if (!defined($self->{value})) {
+      $self->{value} = "";
+    }
+  }
+}
+
+sub delete_to_first {
+  my $self = shift;
+  $self->{value} = substr($self->{value}, $self->{pos});
+  $self->{pos} = 0;
+}
+
+sub delete_to_last {
+  my $self = shift;
+  $self->{value} = substr($self->{value}, 0, $self->{pos});
+}
+
+sub delete_word {
+  my $self = shift;
+  if ($self->{pos} > 0) {
+    my $idx = rindex($self->{value}, " ", $self->{pos}-1)+1;
+    while (($idx > 1) &&
+           (substr($self->{value}, $idx, $self->{pos}-$idx) =~ m/^\s*$/)) {
+      $idx = rindex($self->{value}, " ", $idx-1);
+    }
+    $self->{value} = substr($self->{value}, 0, $idx)
+                     . substr($self->{value}, $self->{pos});
+    $self->{pos} = $idx;
+  }
+}
+
+sub insert_char {
+  my $self = shift;
+  my $c = shift;
+  substr($self->{value}, $self->{pos}, 0) = $c;
+  $self->{pos}++;
+  $self->reset_completion;
 }
 
 sub start_completion {
@@ -137,49 +208,43 @@ sub key_pressed {
   if (defined($c)) {
     if ($c eq "\t") {
       $self->complete_next;
-      1;
+    } elsif (ord($c) < 32) {
+      my $charcode = ord $c;
+      if ($charcode == 1) {        # ^A
+        $self->go_to_first;
+      } elsif ($charcode == 2) {   # ^B
+        $self->go_left;
+      } elsif ($charcode == 4) {   # ^D
+        $self->delete_char;
+      } elsif ($charcode == 5) {   # ^E
+        $self->go_to_last;
+      } elsif ($charcode == 6) {   # ^F
+        $self->go_right;
+      } elsif ($charcode == 8) {   # ^H
+        $self->backspace;
+      } elsif ($charcode == 11) {  # ^K
+        $self->delete_to_last;
+      } elsif ($charcode == 21) {  # ^U
+        $self->delete_to_first;
+      } elsif ($charcode == 23) {  # ^W
+        $self->delete_word;
+      }
     } else {
-      substr($self->{value}, $self->{pos}, 0) = $c;
-      $self->{pos}++;
-      $self->reset_completion;
+      $self->insert_char($c);
     }
   } elsif (defined($key)) {
     if ($key == KEY_BACKSPACE) {
-      if ($self->{pos} > 0) {
-        $self->{value} = substr($self->{value}, 0, $self->{pos}-1)
-                         . substr($self->{value}, $self->{pos});
-        if (!defined($self->{value})) {
-          $self->{value} = "";
-        }
-        $self->{pos}--;
-      }
-      $self->reset_completion;
-    }
-    elsif ($key == KEY_DC) {
-      if ($self->{pos} < length $self->{value}) {
-        $self->{value} = substr($self->{value}, 0, $self->{pos})
-                         . substr($self->{value}, $self->{pos}+1);
-        if (!defined($self->{value})) {
-          $self->{value} = "";
-        }
-      }
-    }
-    elsif ($key == KEY_END) {
-      $self->{pos} = length $self->{value};
-    }
-    elsif ($key == KEY_HOME) {
-      $self->{pos} = 0;
-    }
-    elsif ($key == KEY_LEFT) {
-      if ($self->{pos} > 0) {
-        $self->{pos}--;
-        $self->reset_completion;
-      }
+      $self->backspace;
+    } elsif ($key == KEY_DC) {
+      $self->delete_char;
+    } elsif ($key == KEY_END) {
+      $self->go_to_last;
+    } elsif ($key == KEY_HOME) {
+      $self->go_to_first;
+    } elsif ($key == KEY_LEFT) {
+      $self->go_left;
     } elsif ($key == KEY_RIGHT) {
-      if ($self->{pos} < length $self->{value}) {
-        $self->{pos}++;
-        $self->reset_completion;
-      }
+      $self->go_right;
     }
   }
   $self->redraw;

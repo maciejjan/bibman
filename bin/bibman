@@ -160,7 +160,16 @@ The commands and keybindings are listed below.
 
 =head2 Text input mode
 
- <Tab>             trigger autocompletion
+ <Left>, ^B        move one character back
+ <Right>, ^F       move one character forward
+ <Home>, ^A        move to the beginning of the line
+ <End>, ^E         move to the beginning of the line
+ <Del>, ^D         delete the character under the cursor
+ <Backspace>, ^H   delete the character before the cursor
+ <Tab>, ^I         trigger autocompletion
+ ^K                delete from the cursor to the end of the line
+ ^U                delete from the cursor to the beginning of the line
+ ^W                delete a word before the cursor
 
 =head1 SEARCHING AND FILTERING
 

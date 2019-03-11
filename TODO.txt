@@ -6,9 +6,6 @@ v. 0.3 alpha:
 - more helpful status messages (e.g. errors)
 - autocompletion of file names
 - command line history
-- supporting more key combinations in the text inputs
-  (e.g. C-h for backspace, C-w for deleting the last word etc.)
-  -> EMACS bindings
 - a command for taking notes -- spawn $EDITOR with file KEY.txt
 
 further features:
