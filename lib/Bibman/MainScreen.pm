@@ -117,6 +117,8 @@ sub key_pressed {
         } else {
           $self->{cmd_prompt}->key_pressed($c, $key);
         }
+      } else {
+        $self->{cmd_prompt}->key_pressed($c, $key);
       }
     }
   }

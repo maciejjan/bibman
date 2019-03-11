@@ -198,7 +198,9 @@ sub show {
           } else {
             $self->{inputs}->{$self->{focus}}->key_pressed($c, $key);
           }
-        } 
+        } else {
+          $self->{inputs}->{$self->{focus}}->key_pressed($c, $key);
+        }
       } else {
         if (defined($c)) {
           if ($c eq 'k') {
