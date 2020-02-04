@@ -19,6 +19,7 @@ package KeybindingHandler;
 use strict;
 use warnings;
 
+use Curses;
 use Bibman::StatusBar;
 
 sub new {
@@ -57,20 +58,54 @@ sub new {
   bless $self, $class;
 }
 
-sub translate_key {
-  my $self = shift;
-  my $c = shift;
-  my $key = shift;
+sub get_key {
+  my $win = shift;
+  my ($c, $key) = $win->getchar();
+  my $result;
   if (defined($c)) {
-    return $c;
+    my $charcode = ord $c;
+    if ($charcode < 32) {
+      if ($charcode == 10) {
+        $result = "\n";
+      } elsif ($charcode == 27) {             # Esc
+        timeout($win, 1);
+        my ($c2, $key2) = $win->getchar();
+        timeout($win, -1);
+        if (defined($c2) && (ord($c2) != 27)) {
+          $result = "M-".$c2;
+        } else {
+          $result = "<Esc>";
+        }
+      } else {
+        $result = "^" . chr($charcode+64);
+      }
+    } else {
+      $result = $c;
+    }
+  } elsif (defined($key)) {
+    if ($key == KEY_RESIZE) {
+      $result = "<RESIZE>";
+    } elsif ($key == KEY_UP) {
+      $result = "<Up>";
+    } elsif ($key == KEY_DOWN) {
+      $result = "<Down>";
+    } elsif ($key == KEY_LEFT) {
+      $result = "<Left>";
+    } elsif ($key == KEY_RIGHT) {
+      $result = "<Right>";
+    } elsif ($key == KEY_BACKSPACE) {
+      $result = "<Backspace>";
+    }
   }
+  #if (defined($result)) {
+  #  print STDERR $result."\n";
+  #}
+  return $result;
 }
 
-sub handle_keypress {
+sub handle_key {
   my $self = shift;
-  my $c = shift;
-  my $key = shift;
-  my $key_tr = $self->translate_key($c, $key);
+  my $key_tr = shift;
   if ((defined($key_tr)) && (defined($self->{bindings}->{$key_tr}))) {
     my $cmdline = $self->{bindings}->{$key_tr};
     # performance optimization -- if the command ends in a newline,

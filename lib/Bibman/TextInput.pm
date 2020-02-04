@@ -22,6 +22,8 @@ use feature 'unicode_strings';
 use Curses;
 use List::Util qw( min max );
 
+use Bibman::KeybindingHandler;
+
 sub new {
   my $class = shift;
   my $value = shift;
@@ -152,11 +154,11 @@ sub delete_word {
   }
 }
 
-sub insert_char {
+sub insert {
   my $self = shift;
-  my $c = shift;
-  substr($self->{value}, $self->{pos}, 0) = $c;
-  $self->{pos}++;
+  my $str = shift;
+  substr($self->{value}, $self->{pos}, 0) = $str;
+  $self->{pos} += length $str;
   $self->reset_completion;
 }
 
@@ -202,50 +204,30 @@ sub complete_next {
 
 sub key_pressed {
   my $self = shift;
-  my $c = shift;
   my $key = shift;
 
-  if (defined($c)) {
-    if ($c eq "\t") {
-      $self->complete_next;
-    } elsif (ord($c) < 32) {
-      my $charcode = ord $c;
-      if ($charcode == 1) {        # ^A
-        $self->go_to_first;
-      } elsif ($charcode == 2) {   # ^B
-        $self->go_left;
-      } elsif ($charcode == 4) {   # ^D
-        $self->delete_char;
-      } elsif ($charcode == 5) {   # ^E
-        $self->go_to_last;
-      } elsif ($charcode == 6) {   # ^F
-        $self->go_right;
-      } elsif ($charcode == 8) {   # ^H
-        $self->backspace;
-      } elsif ($charcode == 11) {  # ^K
-        $self->delete_to_last;
-      } elsif ($charcode == 21) {  # ^U
-        $self->delete_to_first;
-      } elsif ($charcode == 23) {  # ^W
-        $self->delete_word;
-      }
-    } else {
-      $self->insert_char($c);
-    }
-  } elsif (defined($key)) {
-    if ($key == KEY_BACKSPACE) {
-      $self->backspace;
-    } elsif ($key == KEY_DC) {
-      $self->delete_char;
-    } elsif ($key == KEY_END) {
-      $self->go_to_last;
-    } elsif ($key == KEY_HOME) {
-      $self->go_to_first;
-    } elsif ($key == KEY_LEFT) {
-      $self->go_left;
-    } elsif ($key == KEY_RIGHT) {
-      $self->go_right;
-    }
+  if ($key eq "^A") {
+    $self->go_to_first;
+  } elsif (($key eq "^B") || ($key eq "<Left>")) {
+    $self->go_left;
+  } elsif ($key eq "^D") {
+    $self->delete_key;
+  } elsif ($key eq "^E") {
+    $self->go_to_last;
+  } elsif (($key eq "^F") || ($key eq "<Right>")) {
+    $self->go_right;
+  } elsif (($key eq "^H") || ($key eq "<Backspace>")) {
+    $self->backspace;
+  } elsif ($key eq "^I") {
+    $self->complete_next;
+  } elsif ($key eq "^K") {
+    $self->delete_to_last;
+  } elsif ($key eq "^U") {
+    $self->delete_to_first;
+  } elsif ($key eq "^W") {
+    $self->delete_word;
+  } else {
+    $self->insert($key);
   }
   $self->redraw;
 }

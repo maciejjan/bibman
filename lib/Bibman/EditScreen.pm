@@ -151,6 +151,39 @@ sub correct_highlight {
   }
 }
 
+sub accept {
+  my $self = shift;
+  my $focus = $self->{focus};
+  if ($focus eq "entry_type") {
+    my $new_type = $self->{inputs}->{$focus}->{value};
+    if (Bibliography::has_type($new_type)) {
+      $self->change_type($new_type);
+      $self->draw;
+    } else {
+      $self->{status}->set("Unknown type: $new_type", StatusBar::ERROR);
+      $self->{inputs}->{$focus}->set_value($self->{properties}->{entry_type});
+    }
+  } else {
+    $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
+  }
+  $self->{inputs}->{$focus}->go_to_first;
+  if (defined($self->{inputs}->{$focus}->{completion})) {
+    $self->{inputs}->{$focus}->reset_completion;
+  }
+  $self->{focus} = undef;
+  curs_set(0);
+}
+
+sub unfocus {
+  my $self = shift;
+  my $focus = $self->{focus};
+  $self->{inputs}->{$focus}->{value} = $self->{properties}->{$focus};
+  $self->{inputs}->{$focus}->go_to_first;
+  $self->{inputs}->{$focus}->redraw;
+  $self->{focus} = undef;
+  curs_set(0);
+}
+
 sub show {
   my $self = shift;
   my $win = shift;
@@ -159,68 +192,31 @@ sub show {
   $self->draw;
 
   while (1) {
-    my ($c, $key) = $win->getchar();
-
-    if (defined($key) && ($key == KEY_RESIZE)) {
-        $self->draw;
+    my $key = KeybindingHandler::get_key($win);
+    if ($key eq "<RESIZE>") {
+      $self->draw;
     } else {
       my $focus = $self->{focus};
       if (defined($focus)) {
-        if (defined($c)) {
-          if ($c eq "\n") {
-            if ($focus eq "entry_type") {
-              my $new_type = $self->{inputs}->{$focus}->{value};
-              if (Bibliography::has_type($new_type)) {
-                $self->change_type($new_type);
-                $self->draw;
-              } else {
-                $self->{status}->set("Unknown type: $new_type", StatusBar::ERROR);
-                $self->{inputs}->{$focus}->set_value($self->{properties}->{entry_type});
-              }
-            } else {
-              $self->{properties}->{$focus} = $self->{inputs}->{$focus}->{value};
-            }
-            $self->{inputs}->{$focus}->go_to_first;
-            if (defined($self->{inputs}->{$focus}->{completion})) {
-              $self->{inputs}->{$focus}->reset_completion;
-            }
-            $self->{focus} = undef;
-            curs_set(0);
-          } elsif ((ord($c) == 7) || (ord($c) == 27)) {     # Esc or ^G
-            $self->{inputs}->{$focus}->{value} = $self->{properties}->{$focus};
-            $self->{inputs}->{$focus}->go_to_first;
-            $self->{inputs}->{$focus}->redraw;
-            $self->{focus} = undef;
-            curs_set(0);
-          } elsif (defined($key) && ($key eq KEY_EXIT)) {
-            $self->{focus} = undef;
-            curs_set(0);
-          } else {
-            $self->{inputs}->{$self->{focus}}->key_pressed($c, $key);
-          }
+        if ($key eq "\n") {
+          $self->accept;
+        } elsif ($key eq "<Esc>") {
+          $self->unfocus;
         } else {
-          $self->{inputs}->{$self->{focus}}->key_pressed($c, $key);
+          $self->{inputs}->{$self->{focus}}->key_pressed($key);
         }
       } else {
-        if (defined($c)) {
-          if ($c eq 'k') {
-            $self->go_up;
-          } elsif ($c eq 'j') {
-            $self->go_down;
-          } elsif ($c eq "\n") {
-            $self->{focus} = ${$self->{fields}}[$self->{highlight}];
-            $self->{inputs}->{$self->{focus}}->go_to_last;
-            curs_set(1);
-            $self->{inputs}->{$self->{focus}}->redraw;
-          } elsif ($c eq 'q') {
-            return $self->{properties};
-          }
-        } elsif (defined($key)) {
-          if ($key == KEY_UP) {
-            $self->go_up;
-          } elsif ($key == KEY_DOWN) {
-            $self->go_down;
-          }
+        if (($key eq 'k') || ($key eq "<Up>")) {
+          $self->go_up;
+        } elsif (($key eq 'j') || ($key eq "<Down>")) {
+          $self->go_down;
+        } elsif ($key eq "\n") {
+          $self->{focus} = ${$self->{fields}}[$self->{highlight}];
+          $self->{inputs}->{$self->{focus}}->go_to_last;
+          curs_set(1);
+          $self->{inputs}->{$self->{focus}}->redraw;
+        } elsif ($key eq 'q') {
+          return $self->{properties};
         }
       }
     }

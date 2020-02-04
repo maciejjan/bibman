@@ -92,33 +92,27 @@ sub exit_command_mode {
 
 sub key_pressed {
   my $self = shift;
-  my $c = shift;
   my $key = shift;
 
-  my $cmd = '';
-  if (defined($key) && ($key == KEY_RESIZE)) {
+  if ($key eq "<RESIZE>") {
     $self->draw;
-  }  else {
+  } else {
     if ($self->{mode} eq "normal") {
-      if ((defined($c)) && ($c eq ':')) {
+      if ($key eq ':') {
         $self->enter_command_mode;
       } else {
-        $self->{kbdhandler}->handle_keypress($c, $key);
+        $self->{kbdhandler}->handle_key($key);
       }
     } elsif ($self->{mode} eq "command") {
-      if (defined($key) && ($key == KEY_BACKSPACE) && (!$self->{cmd_prompt}->{value})) {
+      if ((!$self->{cmd_prompt}->{value}) && ($key eq "<Backspace>")) {
         $self->exit_command_mode;
-      } elsif (defined($c)) {
-        if ($c eq "\n") {
-          $self->exit_command_mode;
-          $self->{cmdinterp}->execute($self->{cmd_prompt}->{value});
-        } elsif ((ord($c) == 7) || (ord($c) == 27)) {     # Esc or ^G
-          $self->exit_command_mode;
-        } else {
-          $self->{cmd_prompt}->key_pressed($c, $key);
-        }
+      } elsif ($key eq "\n") {
+        $self->exit_command_mode;
+        $self->{cmdinterp}->execute($self->{cmd_prompt}->{value});
+      } elsif ($key eq "<Esc>") {
+        $self->exit_command_mode;
       } else {
-        $self->{cmd_prompt}->key_pressed($c, $key);
+        $self->{cmd_prompt}->key_pressed($key);
       }
     }
   }
@@ -132,7 +126,8 @@ sub show {
   $self->draw;
 
   while (1) {
-    $self->key_pressed($win->getchar());
+    my $key = KeybindingHandler::get_key($win);
+    $self->key_pressed($key);
   }
 }
 
