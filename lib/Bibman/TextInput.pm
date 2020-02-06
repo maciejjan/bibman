@@ -211,7 +211,7 @@ sub key_pressed {
   } elsif (($key eq "^B") || ($key eq "<Left>")) {
     $self->go_left;
   } elsif ($key eq "^D") {
-    $self->delete_key;
+    $self->delete_char;
   } elsif ($key eq "^E") {
     $self->go_to_last;
   } elsif (($key eq "^F") || ($key eq "<Right>")) {
