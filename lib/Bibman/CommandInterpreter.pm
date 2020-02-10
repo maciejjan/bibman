@@ -145,6 +145,8 @@ sub redo {
 sub do_add {
   my $self = shift;
   my $cmd = shift;
+
+  $self->{mainscr}->{status}->clear;
   my $editscr = new EditScreen({ entry_type => "article" });
   $editscr->init_completion($self->{model});
   my $properties = $editscr->show($self->{mainscr}->{win});
@@ -175,6 +177,8 @@ sub do_center {
 sub do_edit {
   my $self = shift;
   my $cmd = shift;
+
+  $self->{mainscr}->{status}->clear;
   my $editscr = new EditScreen(Bibliography::get_properties($cmd->{hl_entry}));
   $editscr->init_completion($self->{model});
   my $properties = $editscr->show($self->{mainscr}->{win});

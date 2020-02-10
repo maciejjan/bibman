@@ -33,6 +33,12 @@ sub new {
   bless $self, $class;
 }
 
+sub clear {
+  my $self = shift;
+  $self->{status} = "";
+  $self->{type} = INFO;
+}
+
 sub draw {
   my $self = shift;
   my $win = shift;

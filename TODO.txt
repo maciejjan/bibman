@@ -10,7 +10,6 @@ v. 0.3 alpha:
 
 further features:
 - a command history
-- autohiding the status bar and command line
 - configurable colors
 - configuration files
 - optional and required fields

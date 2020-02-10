@@ -60,8 +60,8 @@ sub draw {
   $self->{win}->erase;
   my ($maxy, $maxx);
   $self->{win}->getmaxyx($maxy, $maxx);
-  $self->{list}->draw($self->{win}, 0, 0, $maxx, $maxy-3);
-  $self->{status}->draw($self->{win}, $maxy-2);
+  $self->{list}->draw($self->{win}, 0, 0, $maxx, $maxy-2);
+  $self->{status}->draw($self->{win}, $maxy-1);
   if ($self->{mode} eq "command") {
     $self->{win}->addstring($maxy-1, 0, ":");
     $self->{cmd_prompt}->draw($self->{win}, 1, $maxy-1, $maxx-2);
@@ -76,6 +76,7 @@ sub enter_command_mode {
   } else {
     $cmd = "";
   }
+  $self->{status}->clear;
   $self->{mode} = "command";
   $self->{cmd_prompt}->{value} = $cmd;
   $self->{cmd_prompt}->{pos} = length $cmd;
