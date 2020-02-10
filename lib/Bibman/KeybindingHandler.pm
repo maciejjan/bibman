@@ -62,6 +62,7 @@ sub get_key {
   my $win = shift;
   my ($c, $key) = $win->getchar();
   my $result;
+
   if (defined($c)) {
     my $charcode = ord $c;
     if ($charcode < 32) {
@@ -79,6 +80,8 @@ sub get_key {
       } else {
         $result = "^" . chr($charcode+64);
       }
+    } elsif ($charcode == 127) {
+      $result = "<Del>";
     } else {
       $result = $c;
     }
@@ -95,6 +98,8 @@ sub get_key {
       $result = "<Right>";
     } elsif ($key == KEY_BACKSPACE) {
       $result = "<Backspace>";
+    } else {
+      $result = "<?>";
     }
   }
   #if (defined($result)) {

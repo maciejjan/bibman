@@ -1,11 +1,11 @@
 TODO
 
 v. 0.3 alpha:
+- bug: <Backspace> sends <Del> on st?
 - sorting entries (by one of the columns)
 - help screen, keybinding cheat-sheets
 - more helpful status messages (e.g. errors)
 - autocompletion of file names
-- command line history
 - a command for taking notes -- spawn $EDITOR with file KEY.txt
 
 further features:

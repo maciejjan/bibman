@@ -95,6 +95,25 @@ sub go_right {
   }
 }
 
+sub go_word_left {
+  my $self = shift;
+  my $idx = $self->{pos};
+  while (($idx > 0) && (substr($self->{value}, $idx-1, 1) =~ /\s/)) { $idx--; }
+  while (($idx > 0) && (substr($self->{value}, $idx-1, 1) =~ /\S/)) { $idx--; }
+  $self->{pos} = $idx;
+}
+
+sub go_word_right {
+  my $self = shift;
+  my $idx = $self->{pos};
+  while (($idx < length $self->{value}) &&
+         (substr($self->{value}, $idx+1, 1) =~ /\s/)) { $idx++; }
+  while (($idx < length $self->{value}) &&
+         (substr($self->{value}, $idx+1, 1) =~ /\S/)) { $idx++; }
+  if ($idx < length $self->{value}) { $idx++; }
+  $self->{pos} = $idx;
+}
+
 sub go_to_first {
   my $self = shift;
   $self->{pos} = 0;
@@ -140,7 +159,18 @@ sub delete_to_last {
   $self->{value} = substr($self->{value}, 0, $self->{pos});
 }
 
-sub delete_word {
+sub delete_word_forward {
+  my $self = shift;
+  my $idx = $self->{pos};
+  while (($idx < length $self->{value}) &&
+         (substr($self->{value}, $idx+1, 1) =~ /\s/)) { $idx++; }
+  while (($idx < length $self->{value}) &&
+         (substr($self->{value}, $idx+1, 1) =~ /\S/)) { $idx++; }
+  $self->{value} = substr($self->{value}, 0, $self->{pos})
+                   . substr($self->{value}, $idx+1);
+}
+
+sub delete_word_backward {
   my $self = shift;
   if ($self->{pos} > 0) {
     my $idx = rindex($self->{value}, " ", $self->{pos}-1)+1;
@@ -225,7 +255,13 @@ sub key_pressed {
   } elsif ($key eq "^U") {
     $self->delete_to_first;
   } elsif ($key eq "^W") {
-    $self->delete_word;
+    $self->delete_word_backward;
+  } elsif ($key eq "M-d") {
+    $self->delete_word_forward;
+  } elsif ($key eq "M-b") {
+    $self->go_word_left;
+  } elsif ($key eq "M-f") {
+    $self->go_word_right;
   } else {
     $self->insert($key);
   }
