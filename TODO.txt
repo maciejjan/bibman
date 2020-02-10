@@ -9,6 +9,8 @@ v. 0.3 alpha:
 - a command for taking notes -- spawn $EDITOR with file KEY.txt
 
 further features:
+- a command history
+- autohiding the status bar and command line
 - configurable colors
 - configuration files
 - optional and required fields
