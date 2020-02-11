@@ -99,7 +99,7 @@ sub get_key {
     } elsif ($key == KEY_BACKSPACE) {
       $result = "<Backspace>";
     } else {
-      $result = "<?>";
+      $result = "<$key>";
     }
   }
   #if (defined($result)) {
