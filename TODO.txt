@@ -3,6 +3,7 @@ TODO
 v. 0.3 alpha:
 - bug: <Backspace> sends <Del> on st?
 - maximum column widths for the list
+  - also depending on the terminal width if it's small
 - sorting entries (by one of the columns)
 - help screen, keybinding cheat-sheets
 - more helpful status messages (e.g. errors)
