@@ -4,11 +4,18 @@ v. 0.3 alpha:
 - bug: <Backspace> sends <Del> on st?
 - maximum column widths for the list
   - also depending on the terminal width if it's small
+- a command for taking notes -- spawn $EDITOR with file KEY.txt
+  + the ability to search/filter based on those notes in bibman
+- support other document file extensions (e.g. .ps, .djvu)
+  - iterate over an array of extensions and stop on the first one that is a
+    valid file
 - sorting entries (by one of the columns)
 - help screen, keybinding cheat-sheets
 - more helpful status messages (e.g. errors)
 - autocompletion of file names
-- a command for taking notes -- spawn $EDITOR with file KEY.txt
+- allow to specify the relative paths of directories in which the documents and
+  notes are held (e.g. "docs/", "notes/") - either globally or in a local
+  "bibman.conf" in the same directory as the bibliography file
 
 further features:
 - a command history
