@@ -27,6 +27,7 @@ sub new {
   my $self = {
     columns => shift,
     col_widths => undef,
+    max_col_widths => [],
     highlight => 0,
     top => 0,
     items => []
@@ -97,6 +98,13 @@ sub update_col_widths {
     for my $item (@{$self->{items}}) {
       $self->update_col_widths($item->{values});
     }
+    # if max widths are set -> take them into account
+    for (my $j = 0; $j < $self->{columns}; $j++) {
+      my $mw = $self->{max_col_widths}->[$j];
+      if (defined($mw) && ($mw > 0)) {
+        $self->{col_widths}->[$j] = min($self->{col_widths}->[$j], $mw);
+      }
+    }
   } 
   # else check for one item
   else {
@@ -113,7 +121,9 @@ sub format_item {
   my @formatted_line = ();
   my $length = 0;
   for (my $i = 0; $i < $#{$item->{values}}; $i++) {
-    my $value = ${$item->{values}}[$i];
+    my $value = length($item->{values}->[$i]) <= $self->{col_widths}->[$i] ?
+                $item->{values}->[$i] :
+                substr(${$item->{values}}[$i], 0, $self->{col_widths}->[$i]-1) . "+";
     push @formatted_line, $value;
     my $spacing_length = ${$self->{col_widths}}[$i] + 1 - length $value;
     push @formatted_line, " " x $spacing_length;

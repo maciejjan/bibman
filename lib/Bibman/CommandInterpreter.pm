@@ -555,6 +555,19 @@ sub do_set {
     $self->{mainscr}->{options}->{columns} = \@cols;
     $self->update_view();
     $self->{mainscr}->{list}->redraw;
+  } elsif ($cmd->{args}->[0] eq "maxwidth") {
+    my @widths = ();
+    for my $w (split(/,/, $cmd->{args}->[1])) {
+      my $wi = int($w);
+      if ($wi > 0) {
+        push @widths, $wi;
+      } else {
+        push @widths, 0;
+      }
+    }
+    $self->{mainscr}->{list}->{max_col_widths} = \@widths;
+    $self->{mainscr}->{list}->update_col_widths;
+    $self->{mainscr}->{list}->redraw;
   } else {
     $self->error("Unknown option: $cmd->{args}->[0].");
   }
