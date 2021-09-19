@@ -54,6 +54,7 @@ sub new {
       search => { do => \&do_search },
       'search-next' => { do => \&do_search_next },
       'search-prev' => { do => \&do_search_prev },
+      'set' => { do => \&do_set },
       undo => { do => \&do_undo },
       yank => { do => \&do_yank },
       quit => { do => \&do_quit },
@@ -109,16 +110,21 @@ sub info {
 }
 
 sub format_entry {
+  my $self = shift;
   my $entry = shift;
 
   my @list_entry = ();
-  if ($entry->key) { push @list_entry, $entry->key; } else { push @list_entry, "unknown"; }
-  my $authors = Bibliography::format_authors($entry);
-  if ($authors) { push @list_entry, $authors; } else { push @list_entry, "unknown"; }
-  my $year = $entry->get('year');
-  if ($year) { push @list_entry, $year; } else { push @list_entry, ""; }
-  my $title = $entry->get('title');
-  if ($title) { push @list_entry, $title; } else { push @list_entry, "unknown"; }
+  for my $column (@{$self->{mainscr}->{options}->{columns}}) {
+    if ($column eq "key") {
+      push @list_entry, ($entry->key || "");
+    } elsif ($column eq "entry_type") {
+      push @list_entry, ($entry->type || "");
+    } elsif ($column eq "author") {
+      push @list_entry,  (Bibliography::format_authors($entry) || "");
+    } else {
+      push @list_entry, ($entry->get($column) || "");
+    }
+  }
   return \@list_entry;
 }
 
@@ -126,8 +132,9 @@ sub update_view {
   my $self = shift;
   my $list = $self->{mainscr}->{list};
   $list->delete_all_items();
+  $list->{columns} = $#{$self->{mainscr}->{options}->{columns}}+1;
   for my $entry (@{$self->{model}->{entries}}) {
-    $list->add_item(format_entry($entry));
+    $list->add_item($self->format_entry($entry));
   }
 }
 
@@ -153,7 +160,7 @@ sub do_add {
   $self->{mainscr}->draw;
   my $new_entry = $self->{model}->create_entry($properties);
   $self->{model}->add_entry_at($cmd->{hl_idx}+1, $new_entry);
-  $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}+1, format_entry($new_entry));
+  $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}+1, $self->format_entry($new_entry));
   $self->{mainscr}->{list}->redraw;
   $self->{mainscr}->{list}->go_down;
   return 1;
@@ -207,7 +214,7 @@ sub do_edit {
 
   my $updated_entry = $self->{model}->create_entry($properties);
   $self->{model}->replace_entry_at($cmd->{hl_idx}, $updated_entry);
-  $self->{mainscr}->{list}->update_item($cmd->{hl_idx}, format_entry($updated_entry));
+  $self->{mainscr}->{list}->update_item($cmd->{hl_idx}, $self->format_entry($updated_entry));
   $self->{mainscr}->{list}->redraw;
   return 1;
 }
@@ -216,7 +223,7 @@ sub undo_edit {
   my $self = shift;
   my $cmd = shift;
   $self->{model}->replace_entry_at($cmd->{hl_idx}, $cmd->{hl_entry});
-  $self->{mainscr}->{list}->update_item($cmd->{hl_idx}, format_entry($cmd->{hl_entry}));
+  $self->{mainscr}->{list}->update_item($cmd->{hl_idx}, $self->format_entry($cmd->{hl_entry}));
   $self->{mainscr}->{list}->redraw;
   $self->{mainscr}->{list}->go_to_item($cmd->{hl_idx});
   return 1;
@@ -238,7 +245,7 @@ sub undo_delete {
   my $self = shift;
   my $cmd = shift;
   $self->{model}->add_entry_at($cmd->{hl_idx}, $cmd->{hl_entry});
-  $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}, format_entry($cmd->{hl_entry}));
+  $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}, $self->format_entry($cmd->{hl_entry}));
   $self->{mainscr}->{list}->redraw;
   $self->{mainscr}->{list}->go_to_item($cmd->{hl_idx});
   return 1;
@@ -255,8 +262,8 @@ sub do_move_up {
   my $entry_above = $self->{model}->get($idx-1);
   $self->{model}->replace_entry_at($idx, $entry_above);
   $self->{model}->replace_entry_at($idx-1, $entry);
-  $self->{mainscr}->{list}->update_item($idx, format_entry($entry_above));
-  $self->{mainscr}->{list}->update_item($idx-1, format_entry($entry));
+  $self->{mainscr}->{list}->update_item($idx, $self->format_entry($entry_above));
+  $self->{mainscr}->{list}->update_item($idx-1, $self->format_entry($entry));
   $self->{mainscr}->{list}->redraw;
   $self->{mainscr}->{list}->go_up;
   return 1;
@@ -281,8 +288,8 @@ sub do_move_down {
   my $entry_below = $self->{model}->get($idx+1);
   $self->{model}->replace_entry_at($idx, $entry_below);
   $self->{model}->replace_entry_at($idx+1, $entry);
-  $self->{mainscr}->{list}->update_item($idx, format_entry($entry_below));
-  $self->{mainscr}->{list}->update_item($idx+1, format_entry($entry));
+  $self->{mainscr}->{list}->update_item($idx, $self->format_entry($entry_below));
+  $self->{mainscr}->{list}->update_item($idx+1, $self->format_entry($entry));
   $self->{mainscr}->{list}->redraw;
   $self->{mainscr}->{list}->go_down;
   return 1;
@@ -528,7 +535,7 @@ sub do_paste {
     $new_entry->parse_s($entry_text);
     if ($new_entry->parse_ok) {
       $self->{model}->add_entry_at($cmd->{hl_idx}+1, $new_entry);
-      $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}+1, format_entry($new_entry));
+      $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}+1, $self->format_entry($new_entry));
       $self->{mainscr}->{list}->redraw;
       $self->{mainscr}->{list}->go_down;
     }
@@ -537,6 +544,19 @@ sub do_paste {
     }
   } else {
     $self->error("Could not pipe from xclip.");
+  }
+}
+
+sub do_set {
+  my $self = shift;
+  my $cmd = shift;
+  if ($cmd->{args}->[0] eq "columns") {
+    my @cols = split(/,/, $cmd->{args}->[1]);
+    $self->{mainscr}->{options}->{columns} = \@cols;
+    $self->update_view();
+    $self->{mainscr}->{list}->redraw;
+  } else {
+    $self->error("Unknown option: $cmd->{args}->[0].");
   }
 }
 

@@ -39,6 +39,9 @@ sub new {
     status => new StatusBar(),
     cmd_prompt => new TextInput(""),
     mode   => "normal",               # "normal" or "command"
+    options => {
+      columns => ["key", "author", "year", "title"],
+    },
     filename => undef,
     search_field => undef,
     search_pattern => undef,
