@@ -69,7 +69,7 @@ sub new {
 sub parse_cmdline {
   my $self = shift;
   my $cmdline = shift;
-  my @cmdline_spl = split /\s/, $cmdline;
+  my @cmdline_spl = split(/\s/, $cmdline);
   my $cmd_name = shift @cmdline_spl;
   my $cmd_args = \@cmdline_spl;
   my $hl_idx = $self->{mainscr}->{list}->{highlight};
