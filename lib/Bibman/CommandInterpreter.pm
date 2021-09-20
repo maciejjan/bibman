@@ -551,11 +551,12 @@ sub do_paste {
   my $self = shift;
   my $cmd = shift;
   if (my $entry_text = `xclip -o`) {
-    my $new_entry = Text::BibTeX::Entry->new();
-    $new_entry->parse_s($entry_text);
+    my $new_entry = Text::BibTeX::Entry->new(
+      { binmode => "utf-8" }, $entry_text);
     if ($new_entry->parse_ok) {
       $self->{model}->add_entry_at($cmd->{hl_idx}+1, $new_entry);
-      $self->{mainscr}->{list}->add_item_at($cmd->{hl_idx}+1, $self->format_entry($new_entry));
+      $self->{mainscr}->{list}->add_item_at(
+        $cmd->{hl_idx}+1, $self->format_entry($new_entry));
       $self->{mainscr}->{list}->redraw;
       $self->{mainscr}->{list}->go_down;
     }
