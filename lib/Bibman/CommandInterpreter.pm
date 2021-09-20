@@ -109,6 +109,20 @@ sub info {
   $self->{mainscr}->{status}->set($msg, StatusBar::INFO);
 }
 
+sub load_config {
+  my $self = shift;
+  my $filename = shift;
+  open(my $fh, "<:encoding(utf-8)", $filename);
+  while (defined(my $line = <$fh>)) {
+    $line =~ s/^\s*//;
+    $line =~ s/\s*$//;
+    if ($line) {
+      $self->execute($line);
+    }
+  }
+  close $fh;
+}
+
 sub format_entry {
   my $self = shift;
   my $entry = shift;
@@ -134,8 +148,11 @@ sub update_view {
   $list->delete_all_items();
   $list->{columns} = $#{$self->{mainscr}->{options}->{columns}}+1;
   for my $entry (@{$self->{model}->{entries}}) {
-    $list->add_item($self->format_entry($entry));
+    # do not use TabularList::add_item() here because it updates the
+    # column widths every time
+    push @{$list->{items}}, { values => $self->format_entry($entry), visible => 1 };
   }
+  $list->update_col_widths;
 }
 
 sub add_to_undo_list {
@@ -344,6 +361,9 @@ sub do_open {
   my $cmd = shift;
   $self->{model} = new Bibliography($cmd->{args}[0]);
   $self->update_view();
+  if ($self->{mainscr}->{win}) {
+    $self->{mainscr}->draw;
+  }
   return 1;
 }
 

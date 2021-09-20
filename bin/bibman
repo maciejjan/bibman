@@ -20,6 +20,7 @@ use strict;
 use warnings;
 use feature 'unicode_strings';
 use Curses;
+use Env;
 use Pod::Usage;
 
 use Bibman::MainScreen;
@@ -27,10 +28,26 @@ use Bibman::StatusBar;
 
 use constant VERSION => "0.3.0-alpha";
 
-my $INPUT_FILE;
+my @DEFAULT_CONFIG_FILES = (
+  "$ENV{HOME}/.bibmanrc",
+  "$ENV{HOME}/.config/bibman/bibmanrc"
+);
+
+my ($INPUT_FILE, $CONFIG_FILE);
 my $arg = shift @ARGV;
 while (defined($arg)) {
-  if (($arg eq "-h") || ($arg eq "--help")) {
+  if ($arg eq "-c") {
+    my $filename = shift @ARGV;
+    if (defined($filename) && (-f $filename)) {
+      $CONFIG_FILE = $filename;
+    } elsif (!defined($filename)) {
+      print "ERROR: the -c option needs an argument.\n\n";
+      print_help();
+    } elsif (! -f $filename) {
+      print "ERROR: config file $filename does not exist.\n\n";
+      print_help();
+    }
+  } elsif (($arg eq "-h") || ($arg eq "--help")) {
     print_help();
   } elsif (($arg eq "-v") || ($arg eq "--version")) {
     print_version();
@@ -73,6 +90,19 @@ init_pair(6, COLOR_CYAN, -1);
 init_pair(7, COLOR_MAGENTA, -1);
 
 my $main = new MainScreen();
+
+# load config file
+if ($CONFIG_FILE) {
+  $main->{cmdinterp}->load_config($CONFIG_FILE);
+} else {
+  for my $cfgfile (@DEFAULT_CONFIG_FILES) {
+    if (-f $cfgfile) {
+      $main->{cmdinterp}->load_config($cfgfile);
+      last;
+    }
+  }
+}
+
 $main->{cmdinterp}->execute("open $INPUT_FILE");
 $main->show($win);
 
@@ -97,6 +127,7 @@ bibman [options] FILE
 
 =head1 OPTIONS
 
+ -c FILE                   load a config file from a custom path
  -h, --help                print help and exit
  -v, --version             print version information and exit
 

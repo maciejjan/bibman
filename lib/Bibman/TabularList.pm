@@ -31,7 +31,9 @@ sub new {
     colors => [],
     highlight => 0,
     top => 0,
-    items => []
+    items => [],
+    width => undef,
+    height => undef,
   };
   bless $self, $class;
   $self->reset_col_widths;
@@ -99,19 +101,16 @@ sub update_col_widths {
     for my $item (@{$self->{items}}) {
       $self->update_col_widths($item->{values});
     }
-    # if max widths are set -> take them into account
-    for (my $j = 0; $j < $self->{columns}; $j++) {
-      my $mw = $self->{max_col_widths}->[$j];
-      if (defined($mw) && ($mw > 0)) {
-        $self->{col_widths}->[$j] = min($self->{col_widths}->[$j], $mw);
-      }
-    }
   } 
   # else check for one item
   else {
     for (my $j = 0; $j < $self->{columns}; $j++) {
       ${$self->{col_widths}}[$j] = max(${$self->{col_widths}}[$j],
                                        length ${$values}[$j]);
+      my $mw = $self->{max_col_widths}->[$j];
+      if (defined($mw) && ($mw > 0)) {
+        $self->{col_widths}->[$j] = min($self->{col_widths}->[$j], $mw);
+      }
     }
   }
 }
@@ -137,7 +136,7 @@ sub put_item {
     $cx += length $value;
     last if ($cx == $self->{width});
     if ($i < $#{$item->{values}}) {
-      my $spacing_length = $self->{col_widths}->[$i] + 1 - length $value;
+      my $spacing_length = max($self->{col_widths}->[$i] + 1 - length $value, 0);
       $self->{win}->addstring($y, $cx, " " x $spacing_length);
       $cx += $spacing_length;
     }
@@ -252,9 +251,15 @@ sub redraw {
   my $self = shift;
   my $win = $self->{win};
 
+  # if the list is not yet visible -> ignore
+  if ((!defined($self->{width})) || (!defined($self->{height}))) {
+    return;
+  }
+
   $self->correct_top;
   my $cur_y = 0;
   my $idx = $self->next_visible($self->{top});
+
   while (defined($idx) && ($cur_y <= $self->{height}) && ($idx <= $#{$self->{items}})) {
     $self->put_item($cur_y, 0, ($self->{highlight} == $idx), $self->{items}->[$idx]);
     $cur_y++;
