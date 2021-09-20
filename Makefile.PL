@@ -11,5 +11,6 @@ WriteMakefile(
     "List::Util"       => 0,
     "Pod::Usage"       => 0,
     "Text::BibTeX"     => 0,
+    "Try::Tiny"        => 0,
   }
 );

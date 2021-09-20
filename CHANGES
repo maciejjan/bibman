@@ -1,3 +1,9 @@
+0.4.0-alpha
+- loading a config file
+- setting options: columns, maxwidth, listcolors
+- custom keybindings (:bind)
+- piping to/from an arbitrary shell command
+
 0.3.0-alpha
 - installing with Makefile.PL
 - yank/paste to/from xclip

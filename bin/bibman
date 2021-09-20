@@ -127,7 +127,7 @@ bibman [options] FILE
 
 =head1 OPTIONS
 
- -c FILE                   load a config file from a custom path
+ -c FILE                   load a configuration file from a custom path
  -h, --help                print help and exit
  -v, --version             print version information and exit
 
@@ -165,9 +165,9 @@ The commands and keybindings are listed below.
  a, :add            add new entry
  e, :edit           edit entry
  d, :delete         delete entry
- p, :paste          paste an entry from X primary selection (requires xclip)
  u, :undo           undo last operation
- y, :yank           copy current entry to X primary selection (requires xclip)
+ :pipe-from         create a new entry from the output of a shell command
+ :pipe-to           pipe the current entry to a shell command
  -, :move-up        move entry up
  +, :move-down      move entry down
 
@@ -186,6 +186,12 @@ The commands and keybindings are listed below.
  O, :open [FILENAME]    open a bibliography file
  s, :save               save the entry to the current file
  S, :save [FILENAME]    save the entry to file FILENAME
+
+=head2 Customization
+
+ :bind KEY ACTION       binds a KEY to an ACTION
+ :unbind KEY            unbinds the KEY
+ :set OPTION VALUE      sets an option value (see CONFIGURATION)
 
 =head2 Edit screen
 
@@ -210,6 +216,42 @@ The commands and keybindings are listed below.
  M-f               move one word forward
  ^U                delete from the cursor to the beginning of the line
  ^W                delete a word before the cursor
+
+=head1 CONFIGURATION
+
+On startup, Bibman attempts to load a configuration file either from
+the path specified by the B<-c> parameter, or from one of the two
+standard paths: $HOME/.config/bibman/bibmanrc or $HOME/.bibmanrc .
+The configuration file contains a sequence of commands (one command per
+line, no comments) that are run on startup. The commands useful for
+customization are B<set> and B<bind>.
+
+The command B<set> can be used to set configuration options. The following
+options are available:
+
+B<columns> - 
+a comma-separated list of entry fields to display as list columns
+(default: key,author,year,title).
+
+B<maxwidth> -
+a comma-separated defining the maximum width of each column
+(0 means "unspecified").
+
+B<listcolors> -
+a comma-separated list defining the colors of each column. The colors
+must be specified as a number: 0:black, 1:white, 2:red, 3:green,
+4:yellow, 5:blue, 6:cyan, 7:magenta.
+
+The command B<bind> can be used to bind keys to actions in the list
+view. For example to use xclip(1) for copy-pasting, you may set the
+following bindings:
+
+  :bind y pipe-to xclip -i
+  :bind p pipe-from xclip -o
+
+If the command expects interactive input, prepend colon to it as follows:
+
+  :bind A :search author
 
 =head1 SEARCHING AND FILTERING
 
