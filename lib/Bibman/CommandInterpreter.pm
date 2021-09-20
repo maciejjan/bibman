@@ -417,7 +417,7 @@ sub match {
   } else {
     for (my $i = 0; $i < $self->{mainscr}->{list}->{columns}; $i++) {
       my $list_item = ${$self->{mainscr}->{list}->{items}}[$idx];
-      if (${$list_item->{values}}[$i] =~ /$pattern/) {
+      if (${$list_item->{values}}[$i] =~ /$pattern/i) {
         return 1;
       }
     }
