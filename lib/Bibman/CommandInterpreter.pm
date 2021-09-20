@@ -20,6 +20,7 @@ use strict;
 use warnings;
 use Env;
 use File::Basename;
+use Try::Tiny;
 
 use Bibman::Bibliography;
 use Bibman::EditScreen;
@@ -49,14 +50,14 @@ sub new {
       'open-entry' => { do => \&do_open_entry },
       'page-down' => { do => \&do_go_page_down },
       'page-up' => { do => \&do_go_page_up },
-      paste => { do => \&do_paste },
+      'pipe-from' => { do => \&do_pipe_from },
+      'pipe-to' => { do => \&do_pipe_to },
       save => { do => \&do_save },
       search => { do => \&do_search },
       'search-next' => { do => \&do_search_next },
       'search-prev' => { do => \&do_search_prev },
       'set' => { do => \&do_set },
       undo => { do => \&do_undo },
-      yank => { do => \&do_yank },
       quit => { do => \&do_quit },
     },
     undo_pos => -1,
@@ -534,37 +535,44 @@ sub do_undo {
   return 1;
 }
 
-sub do_yank {
+sub do_pipe_to {
   my $self = shift;
   my $cmd = shift;
-  if (open(my $pipe, "|-:encoding(UTF-8)", "xclip -i")) {
+  my $call = join(" ", @{$cmd->{args}});
+  if (open(my $pipe, "|-:encoding(UTF-8)", $call)) {
     print $pipe $cmd->{hl_entry}->print_s();
     close($pipe);
     my $key = Bibliography::get_property($cmd->{hl_entry}, "key");
-    $self->info("Copied $key to primary selection.");
+    $self->info("Piped $key to $call");
   } else {
-    $self->error("Could not pipe to xclip.");
+    $self->error("Could not call the command: $call");
   }
 }
 
-sub do_paste {
+sub do_pipe_from {
   my $self = shift;
   my $cmd = shift;
-  if (my $entry_text = `xclip -o`) {
+  my $call = join(" ", @{$cmd->{args}});
+  if (my $entry_text = `$call`) {
+    try {
     my $new_entry = Text::BibTeX::Entry->new(
       { binmode => "utf-8" }, $entry_text);
-    if ($new_entry->parse_ok) {
-      $self->{model}->add_entry_at($cmd->{hl_idx}+1, $new_entry);
-      $self->{mainscr}->{list}->add_item_at(
-        $cmd->{hl_idx}+1, $self->format_entry($new_entry));
-      $self->{mainscr}->{list}->redraw;
-      $self->{mainscr}->{list}->go_down;
+      if ($new_entry->parse_ok) {
+        $self->{model}->add_entry_at($cmd->{hl_idx}+1, $new_entry);
+        $self->{mainscr}->{list}->add_item_at(
+          $cmd->{hl_idx}+1, $self->format_entry($new_entry));
+        $self->{mainscr}->{list}->redraw;
+        $self->{mainscr}->{list}->go_down;
+      }
+      else {
+        $self->error("The command '$call' did not return a valid BibTeX entry.");
+      }
     }
-    else {
-      $self->error("Clipboard does not contain a valid BibTeX entry.");
+    catch {
+      $self->error("The command '$call' did not return a valid BibTeX entry.");
     }
   } else {
-    $self->error("Could not pipe from xclip.");
+    $self->error("Could not call the command: $call");
   }
 }
 
