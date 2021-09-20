@@ -28,6 +28,7 @@ sub new {
     columns => shift,
     col_widths => undef,
     max_col_widths => [],
+    colors => [],
     highlight => 0,
     top => 0,
     items => []
@@ -115,30 +116,35 @@ sub update_col_widths {
   }
 }
 
-sub format_item {
-  my $self = shift;
-  my $item = shift;
+sub put_item {
+  my ($self, $y, $x, $hl, $item) = @_;
   my @formatted_line = ();
   my $length = 0;
-  for (my $i = 0; $i < $#{$item->{values}}; $i++) {
+  my $cx = 0;
+  $hl && $self->{win}->attron(A_REVERSE);
+  for (my $i = 0; $i <= $#{$item->{values}}; $i++) {
     my $value = length($item->{values}->[$i]) <= $self->{col_widths}->[$i] ?
                 $item->{values}->[$i] :
                 substr(${$item->{values}}[$i], 0, $self->{col_widths}->[$i]-1) . "+";
-    push @formatted_line, $value;
-    my $spacing_length = ${$self->{col_widths}}[$i] + 1 - length $value;
-    push @formatted_line, " " x $spacing_length;
-    $length += length($value) + $spacing_length;
+    $value = substr($value, 0, $self->{width}-$cx);
+    if ((!$hl) && (defined($self->{colors}->[$i]))) {
+      $self->{win}->attron(COLOR_PAIR($self->{colors}->[$i]));
+    }
+    $self->{win}->addstring($y, $cx, $value);
+    if ((!$hl) && (defined($self->{colors}->[$i]))) {
+      $self->{win}->attroff(COLOR_PAIR($self->{colors}->[$i]));
+    }
+    $cx += length $value;
+    last if ($cx == $self->{width});
+    if ($i < $#{$item->{values}}) {
+      my $spacing_length = $self->{col_widths}->[$i] + 1 - length $value;
+      $self->{win}->addstring($y, $cx, " " x $spacing_length);
+      $cx += $spacing_length;
+    }
   }
-  push @formatted_line, ${$item->{values}}[-1];
-  my $trailing_length = $self->{width} - $length;
-  if ($trailing_length > 0) {
-    push @formatted_line, " " x $trailing_length;
-  }
-  my $formatted_line_str = join "", @formatted_line;
-  if (length $formatted_line_str > $self->{width}) {
-    $formatted_line_str = substr $formatted_line_str, 0, $self->{width};
-  }
-  return $formatted_line_str;
+  my $trailing_length = $self->{width} - $cx;
+  $self->{win}->addstring($y, $cx, " " x $trailing_length);
+  $hl && $self->{win}->attroff(A_REVERSE);
 }
 
 sub center {
@@ -250,13 +256,7 @@ sub redraw {
   my $cur_y = 0;
   my $idx = $self->next_visible($self->{top});
   while (defined($idx) && ($cur_y <= $self->{height}) && ($idx <= $#{$self->{items}})) {
-    if ($self->{highlight} == $idx) {
-      $win->attron(A_REVERSE);
-    }
-    $win->addstring($cur_y, 0, $self->format_item(${$self->{items}}[$idx]));
-    if ($self->{highlight} == $idx) {
-      $win->attroff(A_REVERSE);
-    }
+    $self->put_item($cur_y, 0, ($self->{highlight} == $idx), $self->{items}->[$idx]);
     $cur_y++;
     $idx = $self->next_visible(++$idx);
   }

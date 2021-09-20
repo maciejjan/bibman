@@ -568,6 +568,18 @@ sub do_set {
     $self->{mainscr}->{list}->{max_col_widths} = \@widths;
     $self->{mainscr}->{list}->update_col_widths;
     $self->{mainscr}->{list}->redraw;
+  } elsif ($cmd->{args}->[0] eq "listcolors") {
+    my @cols = ();
+    for my $c (split(/,/, $cmd->{args}->[1])) {
+      my $ci = int($c);
+      if ($ci > 0) {
+        push @cols, $ci;
+      } else {
+        push @cols, 0;
+      }
+    }
+    $self->{mainscr}->{list}->{colors} = \@cols;
+    $self->{mainscr}->{list}->redraw;
   } else {
     $self->error("Unknown option: $cmd->{args}->[0].");
   }
