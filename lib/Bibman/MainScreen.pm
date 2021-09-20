@@ -110,7 +110,7 @@ sub key_pressed {
     } elsif ($self->{mode} eq "command") {
       if ((!$self->{cmd_prompt}->{value}) && ($key eq "<Backspace>")) {
         $self->exit_command_mode;
-      } elsif ($key eq "\n") {
+      } elsif ($key eq "<CR>") {
         $self->exit_command_mode;
         $self->{cmdinterp}->execute($self->{cmd_prompt}->{value});
       } elsif ($key eq "<Esc>") {
