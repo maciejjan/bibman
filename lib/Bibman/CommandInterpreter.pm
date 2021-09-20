@@ -36,6 +36,7 @@ sub new {
     commands => {
       add => { do => \&do_add, undo => \&undo_add },
       'backward-search' => { do => \&do_backward_search },
+      'bind' => { do => \& do_bind },
       center => { do => \&do_center },
       delete => { do => \&do_delete, undo => \&undo_delete },
       edit => { do => \&do_edit, undo => \&undo_edit },
@@ -58,6 +59,7 @@ sub new {
       'search-prev' => { do => \&do_search_prev },
       'set' => { do => \&do_set },
       undo => { do => \&do_undo },
+      unbind => { do => \&do_unbind },
       quit => { do => \&do_quit },
     },
     undo_pos => -1,
@@ -611,6 +613,30 @@ sub do_set {
     $self->{mainscr}->{list}->redraw;
   } else {
     $self->error("Unknown option: $cmd->{args}->[0].");
+  }
+}
+
+sub do_bind {
+  my $self = shift;
+  my $cmd = shift;
+  if ($#{$cmd->{args}} >= 1) {
+    my $key = shift @{$cmd->{args}};
+    my $action = join(" ", @{$cmd->{args}});
+    print STDERR "bind $key $action";
+    $self->{mainscr}->{kbdhandler}->{bindings}->{$key} = $action;
+  } else {
+    $self->error("Syntax: bind KEY ACTION");
+  }
+}
+
+sub do_unbind {
+  my $self = shift;
+  my $cmd = shift;
+  if ($#{$cmd->{args}} >= 0) {
+    my $key = shift @{$cmd->{args}};
+    undef $self->{mainscr}->{kbdhandler}->{bindings}->{$key};
+  } else {
+    $self->error("Syntax: unbind KEY");
   }
 }
 

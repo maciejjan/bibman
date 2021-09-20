@@ -27,32 +27,32 @@ sub new {
   my $self = {
     parent => shift,
     bindings => {
-      "a"    => "add\n",
-      "d"    => "delete\n",
-      "e"    => "edit\n",
-      "f"    => "filter ",
-      "g"    => "go-to-first\n",
-      "G"    => "go-to-last\n",
-      "j"    => "go-down\n",
-      "J"    => "page-down\n",
-      "k"    => "go-up\n",
-      "K"    => "page-up\n",
-      "n"    => "search-next\n",
-      "N"    => "search-prev\n",
-      "o"    => "open-entry\n",
-      "O"    => "open ",
-      "s"    => "save\n",
-      "S"    => "save ",
-      "u"    => "undo\n",
-      "p"    => "pipe-from xclip -o\n",
-      "q"    => "quit\n",
-      "y"    => "pipe-to xclip -i\n",
-      "z"    => "center\n",
-      "+"    => "move-down\n",
-      "-"    => "move-up\n",
-      "/"    => "search ",
-      "?"    => "backward-search ",
-      "<CR>" => "open-entry\n"
+      "a"    => "add",
+      "d"    => "delete",
+      "e"    => "edit",
+      "f"    => ":filter",
+      "g"    => "go-to-first",
+      "G"    => "go-to-last",
+      "j"    => "go-down",
+      "J"    => "page-down",
+      "k"    => "go-up",
+      "K"    => "page-up",
+      "n"    => "search-next",
+      "N"    => "search-prev",
+      "o"    => "open-entry",
+      "O"    => ":open",
+      "s"    => "save",
+      "S"    => ":save",
+      "u"    => "undo",
+      "p"    => "pipe-from xclip -o",
+      "q"    => "quit",
+      "y"    => "pipe-to xclip -i",
+      "z"    => "center",
+      "+"    => "move-down",
+      "-"    => "move-up",
+      "/"    => ":search",
+      "?"    => ":backward-search",
+      "<CR>" => "open-entry"
     }
   };
   bless $self, $class;
@@ -113,16 +113,16 @@ sub handle_key {
   my $key_tr = shift;
   if ((defined($key_tr)) && (defined($self->{bindings}->{$key_tr}))) {
     my $cmdline = $self->{bindings}->{$key_tr};
-    # performance optimization -- if the command ends in a newline,
-    # don't type it into the command line, but execute directly
-    if ($cmdline =~ m/\n$/gm) {
-      chomp($cmdline);
-      $self->{parent}->{cmdinterp}->execute($cmdline);
-    } else {
+    if ($cmdline =~ m/^:/) {
+      $cmdline =~ s/^://;
       $self->{parent}->enter_command_mode;
-      for my $c (split "", $cmdline) {
+      for my $c (split "", $cmdline . " ") {
         $self->{parent}->key_pressed($c, undef);
       }
+    } else {
+      # performance optimization -- if the command doesn't require further
+      # input, don't type it into the command line, but execute directly
+      $self->{parent}->{cmdinterp}->execute($cmdline);
     }
   }
 }
