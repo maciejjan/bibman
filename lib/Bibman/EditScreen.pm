@@ -198,7 +198,7 @@ sub show {
     } else {
       my $focus = $self->{focus};
       if (defined($focus)) {
-        if ($key eq "\n") {
+        if ($key eq "<CR>") {
           $self->accept;
         } elsif ($key eq "<Esc>") {
           $self->unfocus;
@@ -210,7 +210,7 @@ sub show {
           $self->go_up;
         } elsif (($key eq 'j') || ($key eq "<Down>")) {
           $self->go_down;
-        } elsif ($key eq "\n") {
+        } elsif ($key eq "<CR>") {
           $self->{focus} = ${$self->{fields}}[$self->{highlight}];
           $self->{inputs}->{$self->{focus}}->go_to_last;
           curs_set(1);

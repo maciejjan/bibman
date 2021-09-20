@@ -67,7 +67,7 @@ sub get_key {
     my $charcode = ord $c;
     if ($charcode < 32) {
       if ($charcode == 10) {
-        $result = "\n";
+        $result = "<CR>";
       } elsif ($charcode == 27) {             # Esc
         timeout($win, 1);
         my ($c2, $key2) = $win->getchar();
