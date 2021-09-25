@@ -37,7 +37,8 @@ Here are some basic keybindings:
 * **o** open the pdf file if present; the file must be placed in the same
 	directory as the bibliography file and named `KEY.pdf`, where `KEY` is
 	the entry key; by default it runs `xdg-open`, you can override this by
-	setting the environment variable `READER`
+	setting the option `reader`; you can also configure add other
+	document extensions by setting the option `suffixes`,
 * **a** add a new entry,
 * **e** edit the current entry,
 * **u** undo the last operation,
@@ -59,7 +60,7 @@ bibliography files you're working with.
 
 # Author
 
-Maciej Janicki <macjan@o2.pl>, 2017-2020
+Maciej Janicki <macjan@o2.pl>, 2017-2021
 
 Feel free to contact me if you have any requests for features or other
 suggestions.

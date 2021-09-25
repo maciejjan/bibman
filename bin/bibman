@@ -242,6 +242,13 @@ a comma-separated list defining the colors of each column. The colors
 must be specified as a number: 0:black, 1:white, 2:red, 3:green,
 4:yellow, 5:blue, 6:cyan, 7:magenta.
 
+B<reader> -
+the program used to open the documents associated with entries
+(default: xdg-open)
+
+B<suffixes> -
+a comma-separated list of suffixes for document files (e.g.: .pdf,.ps)
+
 The command B<bind> can be used to bind keys to actions in the list
 view. For example to use xclip(1) for copy-pasting, you may set the
 following bindings:
