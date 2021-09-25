@@ -26,7 +26,7 @@ use Pod::Usage;
 use Bibman::MainScreen;
 use Bibman::StatusBar;
 
-use constant VERSION => "0.3.0-alpha";
+use constant VERSION => "0.4-alpha";
 
 my @DEFAULT_CONFIG_FILES = (
   "$ENV{HOME}/.bibmanrc",

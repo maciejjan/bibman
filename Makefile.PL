@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
   NAME          => 'Bibman',
-  VERSION       => '0.3.0-alpha',
+  VERSION       => '0.4-alpha',
   EXE_FILES     => ["bin/bibman"],
   PREREQ_PM     => {
     "Curses"           => 0,

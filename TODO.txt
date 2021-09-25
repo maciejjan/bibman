@@ -1,11 +1,7 @@
 TODO
 
-v. 0.3 alpha:
-- support other document file extensions (e.g. .ps, .djvu)
-  - iterate over an array of extensions and stop on the first one that is a
-    valid file
-
 further features:
+- moving left/right (by one column) in the list view
 - bug: <Backspace> sends <Del> on st?
 - a command for taking notes -- spawn $EDITOR with file KEY.txt
   + the ability to search/filter based on those notes in bibman
@@ -16,10 +12,6 @@ further features:
 - selecting multiple entries
 - group operations, e.g. editing only common fields
 - automatic key generation
-- keybinding tree
-  - binding: key -> command -> function
-  - but first: only binding of single keys without rebinding
-- user-defined keybindings and configuration
 - localization
 - sorting entries (by one of the columns)
 - help screen, keybinding cheat-sheets
