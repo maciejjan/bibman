@@ -626,7 +626,6 @@ sub do_bind {
   if ($#{$cmd->{args}} >= 1) {
     my $key = shift @{$cmd->{args}};
     my $action = join(" ", @{$cmd->{args}});
-    print STDERR "bind $key $action";
     $self->{mainscr}->{kbdhandler}->{bindings}->{$key} = $action;
   } else {
     $self->error("Syntax: bind KEY ACTION");
