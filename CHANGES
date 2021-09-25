@@ -3,6 +3,9 @@
 - setting options: columns, maxwidth, listcolors
 - custom keybindings (:bind)
 - piping to/from an arbitrary shell command
+- the simple search (without specifying FIELD) is now case-insensitive
+- bugfixes
+  - fixed a bug with character encoding when pasting an entry
 
 0.3.0-alpha
 - installing with Makefile.PL
