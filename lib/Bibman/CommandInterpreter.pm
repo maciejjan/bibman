@@ -18,7 +18,6 @@ package CommandInterpreter;
 
 use strict;
 use warnings;
-use Env;
 use File::Basename;
 use Try::Tiny;
 
@@ -375,18 +374,17 @@ sub do_open_entry {
   my $cmd = shift;
   my $dir = dirname($self->{model}->{filename});
   my $key = $cmd->{hl_entry}->key;
-  my $filename =  "$dir/$key.pdf";
-  my $reader = $default_reader;
-  if (defined($ENV{READER})) {
-    $reader = $ENV{READER};
-  }
-  if (-e $filename) {
-    if (fork == 0) {
-      exec "$reader $filename";
+  my $reader = $self->{mainscr}->{options}->{reader};
+  for my $suf (@{$self->{mainscr}->{options}->{suffixes}}) {
+    my $filename = "$dir/$key$suf";
+    if (-e $filename) {
+      if (fork == 0) {
+        exec "$reader $filename";
+      }
+      return;
     }
-  } else {
-    $self->error("File not found: $filename");
   }
+  $self->error("No document found");
 }
 
 sub do_save {
@@ -611,6 +609,12 @@ sub do_set {
     }
     $self->{mainscr}->{list}->{colors} = \@cols;
     $self->{mainscr}->{list}->redraw;
+  } elsif ($cmd->{args}->[0] eq "suffixes") {
+    my @sufs = split(/,/, $cmd->{args}->[1]);
+    $self->{mainscr}->{options}->{suffixes} = \@sufs;
+  } elsif ($cmd->{args}->[0] eq "reader") {
+    shift @{$cmd->{args}};
+    $self->{mainscr}->{options}->{reader} = join(" ", @{$cmd->{args}});
   } else {
     $self->error("Unknown option: $cmd->{args}->[0].");
   }

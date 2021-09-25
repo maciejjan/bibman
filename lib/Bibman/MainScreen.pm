@@ -41,6 +41,8 @@ sub new {
     mode   => "normal",               # "normal" or "command"
     options => {
       columns => ["key", "author", "year", "title"],
+      reader => "xdg-open",
+      suffixes => [".pdf"],
     },
     filename => undef,
     search_field => undef,

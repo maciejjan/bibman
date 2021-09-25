@@ -1,4 +1,4 @@
-0.4.0-alpha
+0.4-alpha
 - loading a config file
 - setting options: columns, maxwidth, listcolors
 - custom keybindings (:bind)
@@ -6,6 +6,10 @@
 - the simple search (without specifying FIELD) is now case-insensitive
 - bugfixes
   - fixed a bug with character encoding when pasting an entry
+- the reader program is now configured using an option
+  (rather than environment variable)
+- instead of looking only for PDFs, :open-entry now looks for files with
+  suffixes specified by the `suffixes` option
 
 0.3.0-alpha
 - installing with Makefile.PL

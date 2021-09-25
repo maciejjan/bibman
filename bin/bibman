@@ -282,10 +282,6 @@ While editing certain text fields, the <Tab> key triggers autocompletion.
 Currently, this functionality is implemented for entry types and the following
 fields: I<author>, I<journal> and I<booktitle>.
 
-=head1 ENVIRONMENT VARIABLES
-
- READER        the program used to open pdf files (default: xdg-open)
- 
 
 =head1 LICENSE
 
